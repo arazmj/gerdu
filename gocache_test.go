@@ -5,19 +5,45 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
+	"sync"
 	"testing"
 )
 
+func TestThreadSafety(t *testing.T) {
+	cache = LRUCache.NewCache(20)
+	var wg sync.WaitGroup
+	c := 1000
+	wg.Add(c)
+
+	for i := 0; i < c; i++ {
+		go func(i int) {
+			defer wg.Done()
+			key := strconv.Itoa(i)
+			cache.Put(key, key)
+			if cache.HasKey(key) {
+				cache.HasKey(key)
+				value, ok := cache.Get(key)
+				if ok && value != key {
+					t.Errorf("The value is not the same %s", value)
+				}
+			}
+		}(i)
+	}
+
+	wg.Wait()
+
+}
 func TestIndexHandler(t *testing.T) {
 	cache = LRUCache.NewCache(2)
 	tests := []struct {
-	name             string
-	r                *http.Request
-	w                *httptest.ResponseRecorder
-	expectedStatus   int
-	expectedResponse string
-}{
+		name             string
+		r                *http.Request
+		w                *httptest.ResponseRecorder
+		expectedStatus   int
+		expectedResponse string
+	}{
 		{
 			name:           "Put 1:1",
 			r:              httptest.NewRequest("PUT", "/cache/1/1", nil),
@@ -37,18 +63,18 @@ func TestIndexHandler(t *testing.T) {
 			expectedStatus: http.StatusOK,
 		},
 		{
-			name:           "Get 2:2",
-			r:              httptest.NewRequest("GET", "/cache/2", nil),
-			w:              httptest.NewRecorder(),
+			name:             "Get 2:2",
+			r:                httptest.NewRequest("GET", "/cache/2", nil),
+			w:                httptest.NewRecorder(),
 			expectedResponse: "2",
-			expectedStatus: http.StatusOK,
+			expectedStatus:   http.StatusOK,
 		},
 		{
-			name:           "Get 3:3",
-			r:              httptest.NewRequest("GET", "/cache/3", nil),
-			w:              httptest.NewRecorder(),
+			name:             "Get 3:3",
+			r:                httptest.NewRequest("GET", "/cache/3", nil),
+			w:                httptest.NewRecorder(),
 			expectedResponse: "3",
-			expectedStatus: http.StatusOK,
+			expectedStatus:   http.StatusOK,
 		},
 		{
 			name:           "Get 1:1",
@@ -82,4 +108,3 @@ func TestIndexHandler(t *testing.T) {
 		})
 	}
 }
-
