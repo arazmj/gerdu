@@ -24,18 +24,18 @@ func TestLRUCache(t *testing.T) {
 }
 
 func TestThreadSafety(t *testing.T) {
-	cache := NewCache(20)
+	capacity := 200
+	cache := NewCache(capacity)
 	var wg sync.WaitGroup
-	c := 1000
+	c := 2000
 	wg.Add(c)
 
 	for i := 0; i < c; i++ {
 		go func(i int) {
 			defer wg.Done()
-			key := strconv.Itoa(i)
-			cache.Put(key, key)
-			if cache.HasKey(key) {
-				cache.HasKey(key)
+			for j := 0; j < c; j++ {
+				key := strconv.Itoa((i + 1) * j)
+				cache.Put(key, key)
 				value, ok := cache.Get(key)
 				if ok && value != key {
 					t.Errorf("The value is not the same %s", value)
