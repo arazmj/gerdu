@@ -3,14 +3,15 @@ package LRUCache
 import (
 	"math/rand"
 	"strconv"
+	"sync"
 	"testing"
 )
 
 func TestLRUCache(t *testing.T) {
 	cache := NewCache(2)
-	cache.Put("1","1")
+	cache.Put("1", "1")
 	cache.Put("2", "2")
-	cache.Put("3","3")
+	cache.Put("3", "3")
 	if value, ok := cache.Get("1"); ok {
 		t.Errorf("Expected value 1 to be evicted but got %s %t", value, ok)
 	}
@@ -22,17 +23,40 @@ func TestLRUCache(t *testing.T) {
 	}
 }
 
+func TestThreadSafety(t *testing.T) {
+	cache := NewCache(20)
+	var wg sync.WaitGroup
+	c := 1000
+	wg.Add(c)
+
+	for i := 0; i < c; i++ {
+		go func(i int) {
+			defer wg.Done()
+			key := strconv.Itoa(i)
+			cache.Put(key, key)
+			if cache.HasKey(key) {
+				cache.HasKey(key)
+				value, ok := cache.Get(key)
+				if ok && value != key {
+					t.Errorf("The value is not the same %s", value)
+				}
+			}
+		}(i)
+	}
+
+	wg.Wait()
+}
+
 func BenchmarkLRUCache(b *testing.B) {
 	cache := NewCache(100)
-	for i:=0; i < b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		key := strconv.Itoa(rand.Int())
 		value := strconv.Itoa(rand.Int())
 		cache.Put(key, value)
 	}
 
-	for i:=0; i < b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		key := strconv.Itoa(rand.Int())
 		cache.Get(key)
 	}
 }
-

@@ -5,36 +5,10 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"strings"
-	"sync"
 	"testing"
 )
 
-func TestThreadSafety(t *testing.T) {
-	cache = LRUCache.NewCache(20)
-	var wg sync.WaitGroup
-	c := 1000
-	wg.Add(c)
-
-	for i := 0; i < c; i++ {
-		go func(i int) {
-			defer wg.Done()
-			key := strconv.Itoa(i)
-			cache.Put(key, key)
-			if cache.HasKey(key) {
-				cache.HasKey(key)
-				value, ok := cache.Get(key)
-				if ok && value != key {
-					t.Errorf("The value is not the same %s", value)
-				}
-			}
-		}(i)
-	}
-
-	wg.Wait()
-
-}
 func TestIndexHandler(t *testing.T) {
 	cache = LRUCache.NewCache(2)
 	tests := []struct {

@@ -3,10 +3,10 @@ package LRUCache
 import "sync"
 
 type Node struct {
-	next 	*Node
-	prev 	*Node
-	key 	string
-	value 	string
+	next  *Node
+	prev  *Node
+	key   string
+	value string
 }
 
 func (c *LRUCache) addNode(node *Node) {
@@ -24,7 +24,6 @@ func removeNode(node *Node) {
 	next.prev = prev
 }
 
-
 func (c *LRUCache) popTail() *Node {
 	prev := c.tail.prev
 	removeNode(prev)
@@ -32,30 +31,31 @@ func (c *LRUCache) popTail() *Node {
 }
 
 type LRUCache struct {
-	cache 	sync.Map
-	head 	*Node
-	tail 	*Node
+	sync.RWMutex
+	cache    map[string]*Node
+	head     *Node
+	tail     *Node
 	capacity int
 }
-
 
 func NewCache(capacity int) LRUCache {
 	head := &Node{}
 	tail := &Node{}
 	head.next = tail
 	tail.prev = head
-	return LRUCache {
-		cache: sync.Map{},
-		head: head,
-		tail: tail,
+	return LRUCache{
+		cache:    map[string]*Node{},
+		head:     head,
+		tail:     tail,
 		capacity: capacity,
 	}
 }
 
-
 func (c *LRUCache) Get(key string) (value string, ok bool) {
-	if value, ok := c.cache.Load(key); ok {
-		node := value.(*Node)
+	defer c.Unlock()
+	c.Lock()
+	if value, ok := c.cache[key]; ok {
+		node := value
 		removeNode(node)
 		c.addNode(node)
 		return node.value, true
@@ -63,29 +63,28 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 	return "", false
 }
 
-func (c *LRUCache) Put(key string, value string)  {
-	if v, ok := c.cache.Load(key); ok {
-		node := v.(*Node)
+func (c *LRUCache) Put(key string, value string) {
+	defer c.Unlock()
+	c.Lock()
+	if v, ok := c.cache[key]; ok {
+		node := v
 		removeNode(node)
 		c.addNode(node)
 		node.value = value
 	} else {
-		node := &Node{ key: key, value: value}
+		node := &Node{key: key, value: value}
 		c.addNode(node)
-		c.cache.Store(key, node)
+		c.cache[key] = node
 		if len(c.cache) > c.capacity {
 			tail := c.popTail()
-			c.cache.Delete(tail.key)
+			delete(c.cache, tail.key)
 		}
 	}
 }
 
-func len(sm sync.Map) (length int) {
-	sm.Range(func(_, _ interface{}) bool {
-		length++
-		return true
-	})
-	return length
+func (c *LRUCache) HasKey(key string) bool {
+	defer c.RUnlock()
+	c.RLock()
+	_, ok := c.cache[key]
+	return ok
 }
-
-
