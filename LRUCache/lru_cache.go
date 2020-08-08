@@ -52,12 +52,12 @@ func NewCache(capacity int) LRUCache {
 }
 
 func (c *LRUCache) Get(key string) (value string, ok bool) {
-	defer c.Unlock()
-	c.Lock()
 	if value, ok := c.cache[key]; ok {
+		c.Lock()
 		node := value
 		removeNode(node)
 		c.addNode(node)
+		c.Unlock()
 		return node.value, true
 	}
 	return "", false

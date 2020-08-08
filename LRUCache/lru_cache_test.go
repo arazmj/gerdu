@@ -24,10 +24,10 @@ func TestLRUCache(t *testing.T) {
 }
 
 func TestThreadSafety(t *testing.T) {
-	capacity := 200
+	capacity := 300
 	cache := NewCache(capacity)
 	var wg sync.WaitGroup
-	c := 2000
+	c := 200
 	wg.Add(c)
 
 	for i := 0; i < c; i++ {
