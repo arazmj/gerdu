@@ -2,6 +2,7 @@ package main
 
 import (
 	"GoCache/LRUCache"
+	"GoCache/Stats"
 	"flag"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -13,10 +14,13 @@ import (
 var cache LRUCache.LRUCache
 
 func main() {
-	capacity := flag.Int("capacity", 100, "how big the cache will be, the old values will be evicted")
+	capacity := flag.Int("capacity", 100,
+		"how big the cache will be, the old values will be evicted")
 	port := flag.Int("port", 8080, "the server port number.")
 	flag.Parse()
-	cache = LRUCache.NewCache(*capacity)
+
+	stats := Stats.NewStats()
+	cache = LRUCache.NewCache(*capacity, stats)
 	router := mux.NewRouter()
 	router.HandleFunc("/cache/{key}", GetHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cache/{key}/{value}", PutHandler).Methods(http.MethodPost)

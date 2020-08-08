@@ -1,8 +1,7 @@
 package LRUCache
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
+	"GoCache/Stats"
 	"sync"
 )
 
@@ -34,45 +33,22 @@ func (c *LRUCache) popTail() *Node {
 	return prev
 }
 
-type Stats struct {
-	hits prometheus.Counter
-	miss prometheus.Counter
-	adds prometheus.Counter
-	dels prometheus.Counter
-}
 type LRUCache struct {
 	sync.RWMutex
-	Stats
+	stats    Stats.Statser
 	cache    map[string]*Node
 	head     *Node
 	tail     *Node
 	capacity int
 }
 
-func NewCache(capacity int) LRUCache {
+func NewCache(capacity int, stats Stats.Statser) LRUCache {
 	head := &Node{}
 	tail := &Node{}
 	head.next = tail
 	tail.prev = head
 	return LRUCache{
-		Stats: Stats{
-			miss: promauto.NewCounter(prometheus.CounterOpts{
-				Name: "go_cache_misses_total",
-				Help: "The total number of missed cache hits",
-			}),
-			hits: promauto.NewCounter(prometheus.CounterOpts{
-				Name: "go_cache_hits_total",
-				Help: "The total number of cache hits",
-			}),
-			adds: promauto.NewCounter(prometheus.CounterOpts{
-				Name: "go_cache_adds_total",
-				Help: "The total number of new added nodes",
-			}),
-			dels: promauto.NewCounter(prometheus.CounterOpts{
-				Name: "go_cache_deletes_total",
-				Help: "The total number of deletes nodes",
-			}),
-		},
+		stats:    stats,
 		cache:    map[string]*Node{},
 		head:     head,
 		tail:     tail,
@@ -84,13 +60,13 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 	if value, ok := c.cache[key]; ok {
-		c.hits.Inc()
+		c.stats.HitOps()
 		node := value
 		removeNode(node)
 		c.addNode(node)
 		return node.value, true
 	}
-	c.miss.Inc()
+	c.stats.MissOps()
 	return "", false
 }
 
@@ -106,9 +82,9 @@ func (c *LRUCache) Put(key string, value string) {
 		node := &Node{key: key, value: value}
 		c.addNode(node)
 		c.cache[key] = node
-		c.adds.Inc()
+		c.stats.AddOps()
 		if len(c.cache) > c.capacity {
-			c.dels.Inc()
+			c.stats.DeleteOps()
 			tail := c.popTail()
 			delete(c.cache, tail.key)
 		}
