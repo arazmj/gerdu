@@ -22,3 +22,8 @@ To retrieve the key
 ```
 curl --request GET localhost:8080/cache/3
 ```
+
+Prometheus metrics
+```
+curl --request GET localhost:8080/metrics
+```

@@ -4,6 +4,7 @@ import (
 	"GoCache/LRUCache"
 	"flag"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"strconv"
@@ -19,6 +20,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/cache/{key}", GetHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cache/{key}/{value}", PutHandler).Methods(http.MethodPost)
+	router.Handle("/metrics", promhttp.Handler())
 	log.Printf("GoCache started listening on %d port\n", *port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), router))
 }
