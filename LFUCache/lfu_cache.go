@@ -29,25 +29,26 @@ func NewCache(capacity int, stats *Stats.Stats) Cache.Cache {
 }
 
 /*
-This is a helper function that used in the following two cases:
+	This is a helper function that used in the following two cases:
 
-1. when Get(key)` is called; and
-2. when Put(key, value)` is called and the key exists.
+	1. when Get(key)` is called; and
+	2. when Put(key, value)` is called and the key exists.
 
-The common point of these two cases is that:
+	The common point of these two cases is that:
 
-1. no new node comes in, and
-2. the node is visited one more times -> node.freq changed ->
-thus the place of this node will change
+	1. no new node comes in, and
+	2. the node is visited one more times -> node.freq changed ->
+	thus the place of this node will change
 
-The logic of this function is:
+	The logic of this function is:
 
-1. pop the node from the old DLinkedList (with freq `f`)
-2. append the node to new DLinkedList (with freq `f+1`)
-3. if old DLinkedList has size 0 and minFreq is `f`,
-update minFreq to `f+1`
+	1. pop the node from the old DLinkedList (with freq `f`)
+	2. append the node to new DLinkedList (with freq `f+1`)
+	3. if old DLinkedList has size 0 and minFreq is `f`,
+	update minFreq to `f+1`
 
-All of the above operations took O(1) time.*/
+	All of the above operations took O(1) time.
+*/
 
 func (c *LFUCache) update(node *DLinkList.Node) {
 	freq := node.Freq
@@ -67,8 +68,9 @@ func (c *LFUCache) update(node *DLinkList.Node) {
 }
 
 /*
-Through checking node[key], we can get the node in O(1) time.
-Just performs update, then we can return the value of node. */
+	Through checking node[key], we can get the node in O(1) time.
+	Just performs update, then we can return the value of node.
+*/
 func (c *LFUCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
@@ -85,24 +87,21 @@ func (c *LFUCache) Get(key string) (value string, ok bool) {
 }
 
 /*
-If `key` already exists in self._node, we do the same operations as `get`, except
-updating the node.val to new value.
+	If `key` already exists in self._node, we do the same operations as `get`, except
+	updating the node.val to new value.	Otherwise
+	1. if the cache reaches its capacity, pop the least frequently used item. (*)
+	2. add new node to self._node
+	3. add new node to the DLinkedList with frequency 1
+	4. reset minFreq to 1
 
-Otherwise, the following logic will be performed
+	(*) How to pop the least frequently used item? Two facts:
 
-1. if the cache reaches its capacity, pop the least frequently used item. (*)
-2. add new node to self._node
-3. add new node to the DLinkedList with frequency 1
-4. reset minFreq to 1
-
-(*) How to pop the least frequently used item? Two facts:
-
-1. we maintain the minFreq, the minimum possible frequency in cache.
-2. All cache with the same frequency are stored as a DLinkedList, with
-recently used order (Always append at head)
-
-The tail of the DLinkedList with minFreq is the least
-recently used one, pop it... */
+	1. we maintain the minFreq, the minimum possible frequency in cache.
+	2. All cache with the same frequency are stored as a DLinkedList, with
+	recently used order (Always append at head)
+	3. The tail of the DLinkedList with minFreq is the least
+	recently used one, pop it.
+*/
 func (c *LFUCache) Put(key, value string) {
 	defer c.Unlock()
 	c.Lock()
@@ -133,6 +132,6 @@ func (c *LFUCache) Put(key, value string) {
 		}
 		c.freq[1].AddNode(node)
 		c.minFreq = 1
-		c.size += 1
+		c.size++
 	}
 }
