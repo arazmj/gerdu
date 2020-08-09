@@ -1,6 +1,6 @@
 # GoCache
 
-GoCache is a thread-safe key-value in-memory database server written in GoLang 
+GoCache is a thread-safe key-value in-memory database server written in GoLang.
 Currently it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used)
 ```
  -capacity int
