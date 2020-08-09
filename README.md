@@ -9,7 +9,7 @@ It also supports for weak reference type of cache where the cache consumes as mu
  -port int
         the server port number. (default 8080)
  -type string
-        type of cache, lru or lfu (default "lru")
+        type of cache, lru or lfu or weak (default "lru")
 ```
 
 Example of usage:
