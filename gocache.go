@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var cache Cache.Cache
@@ -25,9 +26,9 @@ func main() {
 	flag.Parse()
 
 	stats := Stats.NewStats()
-	if *kind == "lru" {
+	if strings.ToLower(*kind) == "lru" {
 		cache = LRUCache.NewCache(*capacity, stats)
-	} else if *kind == "lfu" {
+	} else if strings.ToLower(*kind) == "lfu" {
 		cache = LFUCache.NewLFUCache(*capacity, stats)
 	} else {
 		fmt.Println("Invalid value for type")
