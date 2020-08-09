@@ -1,7 +1,8 @@
 # GoCache
 
 GoCache is a thread-safe key-value in-memory database server written in GoLang.
-Currently it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used)
+Currently it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used). 
+It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
 ```
  -capacity int
         how big the cache will be, the old values will be evicted (default 100)

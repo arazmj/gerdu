@@ -5,6 +5,7 @@ import (
 	"GoCache/LFUCache"
 	"GoCache/LRUCache"
 	"GoCache/Stats"
+	"GoCache/WeakCache"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -22,7 +23,7 @@ func main() {
 	capacity := flag.Int("capacity", 100,
 		"how big the cache will be, the old values will be evicted")
 	port := flag.Int("port", 8080, "the server port number")
-	kind := flag.String("type", "lru", "type of cache, lru or lfu")
+	kind := flag.String("type", "lru", "type of cache, lru or lfu, weak")
 	flag.Parse()
 
 	stats := Stats.NewStats()
@@ -30,6 +31,8 @@ func main() {
 		cache = LRUCache.NewCache(*capacity, stats)
 	} else if strings.ToLower(*kind) == "lfu" {
 		cache = LFUCache.NewCache(*capacity, stats)
+	} else if strings.ToLower(*kind) == "weak" {
+		cache = WeakCache.NewWeakCache(stats)
 	} else {
 		fmt.Println("Invalid value for type")
 		os.Exit(1)
