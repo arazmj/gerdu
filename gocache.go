@@ -1,26 +1,38 @@
 package main
 
 import (
+	"GoCache/Cache"
+	"GoCache/LFUCache"
 	"GoCache/LRUCache"
 	"GoCache/Stats"
 	"flag"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
-var cache LRUCache.LRUCache
+var cache Cache.Cache
 
 func main() {
 	capacity := flag.Int("capacity", 100,
 		"how big the cache will be, the old values will be evicted")
-	port := flag.Int("port", 8080, "the server port number.")
+	port := flag.Int("port", 8080, "the server port number")
+	kind := flag.String("type", "lru", "type of cache, lru or lfu")
 	flag.Parse()
 
 	stats := Stats.NewStats()
-	cache = LRUCache.NewCache(*capacity, stats)
+	if *kind == "lru" {
+		cache = LRUCache.NewCache(*capacity, stats)
+	} else if *kind == "lfu" {
+		cache = LFUCache.NewLFUCache(*capacity, stats)
+	} else {
+		fmt.Println("Invalid value for type")
+		os.Exit(1)
+	}
 	router := mux.NewRouter()
 	router.HandleFunc("/cache/{key}", GetHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cache/{key}/{value}", PutHandler).Methods(http.MethodPost)

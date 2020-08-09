@@ -1,57 +1,25 @@
 package LRUCache
 
 import (
+	"GoCache/Cache"
+	"GoCache/LFUCache/DLinkList"
 	"GoCache/Stats"
 	"sync"
 )
 
-type Node struct {
-	next  *Node
-	prev  *Node
-	key   string
-	value string
-}
-
-func (c *LRUCache) addNode(node *Node) {
-	next := c.head.next
-	c.head.next = node
-	next.prev = node
-	node.next = next
-	node.prev = c.head
-}
-
-func removeNode(node *Node) {
-	prev := node.prev
-	next := node.next
-	prev.next = next
-	next.prev = prev
-}
-
-func (c *LRUCache) popTail() *Node {
-	prev := c.tail.prev
-	removeNode(prev)
-	return prev
-}
-
 type LRUCache struct {
 	sync.RWMutex
-	stats    Stats.Statser
-	cache    map[string]*Node
-	head     *Node
-	tail     *Node
+	stats    Stats.StatUpdater
+	cache    map[string]*DLinkList.Node
+	linklist *DLinkList.DLinkedList
 	capacity int
 }
 
-func NewCache(capacity int, stats Stats.Statser) LRUCache {
-	head := &Node{}
-	tail := &Node{}
-	head.next = tail
-	tail.prev = head
-	return LRUCache{
+func NewCache(capacity int, stats Stats.StatUpdater) Cache.Cache {
+	return &LRUCache{
 		stats:    stats,
-		cache:    map[string]*Node{},
-		head:     head,
-		tail:     tail,
+		cache:    map[string]*DLinkList.Node{},
+		linklist: DLinkList.NewLinkedList(),
 		capacity: capacity,
 	}
 }
@@ -62,9 +30,9 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 	if value, ok := c.cache[key]; ok {
 		c.stats.HitOps()
 		node := value
-		removeNode(node)
-		c.addNode(node)
-		return node.value, true
+		c.linklist.RemoveNode(node)
+		c.linklist.AddNode(node)
+		return node.Value, true
 	}
 	c.stats.MissOps()
 	return "", false
@@ -75,18 +43,18 @@ func (c *LRUCache) Put(key string, value string) {
 	c.Lock()
 	if v, ok := c.cache[key]; ok {
 		node := v
-		removeNode(node)
-		c.addNode(node)
-		node.value = value
+		c.linklist.RemoveNode(node)
+		c.linklist.AddNode(node)
+		node.Value = value
 	} else {
-		node := &Node{key: key, value: value}
-		c.addNode(node)
+		node := &DLinkList.Node{Key: key, Value: value}
+		c.linklist.AddNode(node)
 		c.cache[key] = node
 		c.stats.AddOps()
 		if len(c.cache) > c.capacity {
 			c.stats.DeleteOps()
-			tail := c.popTail()
-			delete(c.cache, tail.key)
+			tail := c.linklist.PopTail()
+			delete(c.cache, tail.Key)
 		}
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-type Statser interface {
+type StatUpdater interface {
 	AddOps()
 	MissOps()
 	DeleteOps()
@@ -13,43 +13,43 @@ type Statser interface {
 }
 
 type Stats struct {
-	Hits prometheus.Counter
-	Miss prometheus.Counter
-	Adds prometheus.Counter
-	Dels prometheus.Counter
+	hits prometheus.Counter
+	miss prometheus.Counter
+	adds prometheus.Counter
+	dels prometheus.Counter
 }
 
 func (s *Stats) AddOps() {
-	s.Adds.Inc()
+	s.adds.Inc()
 }
 
 func (s *Stats) MissOps() {
-	s.Miss.Inc()
+	s.miss.Inc()
 }
 
 func (s *Stats) DeleteOps() {
-	s.Dels.Inc()
+	s.dels.Inc()
 }
 
 func (s *Stats) HitOps() {
-	s.Hits.Inc()
+	s.hits.Inc()
 }
 
 func NewStats() *Stats {
 	return &Stats{
-		Miss: promauto.NewCounter(prometheus.CounterOpts{
+		miss: promauto.NewCounter(prometheus.CounterOpts{
 			Name: "go_cache_misses_total",
 			Help: "The total number of missed cache hits",
 		}),
-		Hits: promauto.NewCounter(prometheus.CounterOpts{
+		hits: promauto.NewCounter(prometheus.CounterOpts{
 			Name: "go_cache_hits_total",
 			Help: "The total number of cache hits",
 		}),
-		Adds: promauto.NewCounter(prometheus.CounterOpts{
+		adds: promauto.NewCounter(prometheus.CounterOpts{
 			Name: "go_cache_adds_total",
 			Help: "The total number of new added nodes",
 		}),
-		Dels: promauto.NewCounter(prometheus.CounterOpts{
+		dels: promauto.NewCounter(prometheus.CounterOpts{
 			Name: "go_cache_deletes_total",
 			Help: "The total number of deletes nodes",
 		}),

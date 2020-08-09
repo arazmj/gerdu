@@ -1,6 +1,7 @@
 package LRUCache
 
 import (
+	"GoCache/Stats"
 	"math/rand"
 	"strconv"
 	"sync"
@@ -8,7 +9,7 @@ import (
 )
 
 func TestLRUCache(t *testing.T) {
-	cache := NewCache(2)
+	cache := NewCache(2, Stats.NewStats())
 	cache.Put("1", "1")
 	cache.Put("2", "2")
 	cache.Put("3", "3")
@@ -25,7 +26,7 @@ func TestLRUCache(t *testing.T) {
 
 func TestThreadSafety(t *testing.T) {
 	capacity := 300
-	cache := NewCache(capacity)
+	cache := NewCache(capacity, Stats.NewStats())
 	var wg sync.WaitGroup
 	c := 200
 	wg.Add(c)
@@ -48,7 +49,7 @@ func TestThreadSafety(t *testing.T) {
 }
 
 func BenchmarkLRUCache(b *testing.B) {
-	cache := NewCache(100)
+	cache := NewCache(100, Stats.NewStats())
 	for i := 0; i < b.N; i++ {
 		key := strconv.Itoa(rand.Int())
 		value := strconv.Itoa(rand.Int())
