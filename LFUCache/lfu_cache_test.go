@@ -9,7 +9,7 @@ import (
 
 func TestThreadSafety(t *testing.T) {
 	capacity := 300
-	cache := NewLFUCache(capacity, Stats.NewStats())
+	cache := NewCache(capacity, Stats.NewStats())
 	var wg sync.WaitGroup
 	c := 200
 	wg.Add(c)
@@ -32,7 +32,7 @@ func TestThreadSafety(t *testing.T) {
 }
 func TestNewLFUCache(t *testing.T) {
 	c := 100
-	cache := NewLFUCache(c, nil).(*LFUCache)
+	cache := NewCache(c, nil).(*LFUCache)
 	for i := 0; i < c; i++ {
 		itoa := strconv.Itoa(i)
 		cache.Put(itoa, itoa)
@@ -102,7 +102,7 @@ func TestNewLFUCache(t *testing.T) {
 }
 
 func TestLFUCache_Update(t *testing.T) {
-	cache := NewLFUCache(10, nil).(*LFUCache)
+	cache := NewCache(10, nil).(*LFUCache)
 	cache.Put("20", "20")
 	if cache.freq[1].Size != 1 {
 		t.Errorf("Expected size of 1")

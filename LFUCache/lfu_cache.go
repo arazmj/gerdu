@@ -17,7 +17,7 @@ type LFUCache struct {
 	minFreq  int
 }
 
-func NewLFUCache(capacity int, stats *Stats.Stats) Cache.Cache {
+func NewCache(capacity int, stats *Stats.Stats) Cache.Cache {
 	return &LFUCache{
 		size:     0,
 		capacity: capacity,

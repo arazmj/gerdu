@@ -29,7 +29,7 @@ func main() {
 	if strings.ToLower(*kind) == "lru" {
 		cache = LRUCache.NewCache(*capacity, stats)
 	} else if strings.ToLower(*kind) == "lfu" {
-		cache = LFUCache.NewLFUCache(*capacity, stats)
+		cache = LFUCache.NewCache(*capacity, stats)
 	} else {
 		fmt.Println("Invalid value for type")
 		os.Exit(1)
