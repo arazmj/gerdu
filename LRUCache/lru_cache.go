@@ -2,7 +2,7 @@ package LRUCache
 
 import (
 	"GoCache/Cache"
-	"GoCache/LFUCache/DLinkList"
+	"GoCache/DLinkList"
 	"GoCache/Stats"
 	"sync"
 )
