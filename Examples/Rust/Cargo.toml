@@ -1,0 +1,15 @@
+[package]
+name = "go_cache_rust"
+version = "0.1.0"
+authors = ["Amir Razmjou <arazmj>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = "0.10.7"
+tokio = { version = "0.2", features = ["macros"] }
+
+[[bin]]
+name = "go_cache_rust"
+path = "main.rs"
