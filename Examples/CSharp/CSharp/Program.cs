@@ -15,8 +15,8 @@ namespace CSharp
         {
             var client = new HttpClient();
 
-            client.PostAsync($"{_hostname}:{_port}/cache/Hello/World", 
-                new StringContent("")).Wait();
+            client.PostAsync($"{_hostname}:{_port}/cache/Hello",
+                new StringContent("World")).Wait();
 
             var response = client.GetAsync($"{_hostname}:{_port}/cache/Hello")
                 .Result;

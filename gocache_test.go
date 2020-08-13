@@ -21,19 +21,19 @@ func TestIndexHandler(t *testing.T) {
 	}{
 		{
 			name:           "Put 1:1",
-			r:              httptest.NewRequest("PUT", "/cache/1/1", nil),
+			r:              httptest.NewRequest("PUT", "/cache/1", strings.NewReader("1")),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusOK,
 		},
 		{
 			name:           "Put 2:2",
-			r:              httptest.NewRequest("PUT", "/cache/2/2", nil),
+			r:              httptest.NewRequest("PUT", "/cache/2", strings.NewReader("2")),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusOK,
 		},
 		{
 			name:           "Put 3:3",
-			r:              httptest.NewRequest("PUT", "/cache/3/3", nil),
+			r:              httptest.NewRequest("PUT", "/cache/3", strings.NewReader("3")),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusOK,
 		},
@@ -63,7 +63,7 @@ func TestIndexHandler(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if strings.HasPrefix(test.name, "Put") {
 				router := mux.NewRouter()
-				router.HandleFunc("/cache/{key}/{value}", PutHandler)
+				router.HandleFunc("/cache/{key}", PutHandler)
 				router.ServeHTTP(test.w, test.r)
 
 				if test.w.Code != test.expectedStatus {

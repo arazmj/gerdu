@@ -15,10 +15,10 @@ It also supports for weak reference type of cache where the cache consumes as mu
 Example of usage:
 To insert or update a key 
 ```
-curl --request POST http://localhost:8080/cache/1/1
-curl --request POST http://localhost:8080/cache/2/2
-curl --request POST http://localhost:8080/cache/3/3
-curl --request POST http://localhost:8080/cache/3/alskdjfhaslkdjfhasklfhdlkasjdhflaksfhdakljdshflkasjhfalskdjfhasldkhfasdklfdhlksajdfhas
+curl --request POST --data '1' http://localhost:8080/cache/1
+curl --request POST --data '2' http://localhost:8080/cache/2
+curl --request POST --data '3' http://localhost:8080/cache/3
+curl --request POST --data 'some new value' http://localhost:8080/cache/3
 ```
 
 To retrieve the key

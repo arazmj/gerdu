@@ -6,10 +6,12 @@ public class GoCache {
         String hostname = "http://localhost";
         String port = "8080";
 
-        URL url = new URL(hostname + ":" + port + "/cache/Hello/World");
+        URL url = new URL(hostname + ":" + port + "/cache/Hello");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
+        OutputStream outputStream = connection.getOutputStream();
+        outputStream.write("World".getBytes());
         connection.getInputStream();
 
         url = new URL(hostname + ":" + port + "/cache/Hello");

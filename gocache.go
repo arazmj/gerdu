@@ -6,6 +6,7 @@ import (
 	"GoCache/LRUCache"
 	"GoCache/Stats"
 	"GoCache/WeakCache"
+	"bytes"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -39,7 +40,7 @@ func main() {
 	}
 	router := mux.NewRouter()
 	router.HandleFunc("/cache/{key}", GetHandler).Methods(http.MethodGet)
-	router.HandleFunc("/cache/{key}/{value}", PutHandler).Methods(http.MethodPost)
+	router.HandleFunc("/cache/{key}", PutHandler).Methods(http.MethodPost)
 	router.Handle("/metrics", promhttp.Handler())
 	log.Printf("GoCache started listening on %d port\n", *port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), router))
@@ -48,7 +49,9 @@ func main() {
 func PutHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
-	value := vars["value"]
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r.Body)
+	value := buf.String()
 	cache.Put(key, value)
 	w.WriteHeader(http.StatusOK)
 }
