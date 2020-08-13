@@ -9,7 +9,10 @@ import (
 
 func main() {
 	url := "http://localhost:8080/cache/Hello"
-	http.Post(url, "", bytes.NewBufferString("World"))
+	client := &http.Client{}
+	request, _ := http.NewRequest(http.MethodPut, url, bytes.NewBufferString("World"))
+	client.Do(request)
+
 	response, err := http.Get(url)
 	if err == nil {
 		value, err := ioutil.ReadAll(response.Body)

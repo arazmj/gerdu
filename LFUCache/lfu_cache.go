@@ -102,7 +102,7 @@ func (c *LFUCache) Get(key string) (value string, ok bool) {
 	3. The tail of the DLinkedList with minFreq is the least
 	recently used one, pop it.
 */
-func (c *LFUCache) Put(key, value string) {
+func (c *LFUCache) Put(key, value string) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if c.capacity == 0 {
@@ -113,6 +113,7 @@ func (c *LFUCache) Put(key, value string) {
 		node := c.node[key]
 		c.update(node)
 		node.Value = value
+		created = false
 	} else {
 		if c.size == c.capacity {
 			c.stats.DeleteOps()
@@ -133,5 +134,7 @@ func (c *LFUCache) Put(key, value string) {
 		c.freq[1].AddNode(node)
 		c.minFreq = 1
 		c.size++
+		created = true
 	}
+	return created
 }

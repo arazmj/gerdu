@@ -40,7 +40,7 @@ func main() {
 	}
 	router := mux.NewRouter()
 	router.HandleFunc("/cache/{key}", GetHandler).Methods(http.MethodGet)
-	router.HandleFunc("/cache/{key}", PutHandler).Methods(http.MethodPost)
+	router.HandleFunc("/cache/{key}", PutHandler).Methods(http.MethodPut)
 	router.Handle("/metrics", promhttp.Handler())
 	log.Printf("GoCache started listening on %d port\n", *port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), router))
@@ -52,8 +52,12 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
 	value := buf.String()
-	cache.Put(key, value)
-	w.WriteHeader(http.StatusOK)
+	created := cache.Put(key, value)
+	if created {
+		w.WriteHeader(http.StatusCreated)
+	} else {
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {

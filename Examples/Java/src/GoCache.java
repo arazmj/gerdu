@@ -9,7 +9,7 @@ public class GoCache {
         URL url = new URL(hostname + ":" + port + "/cache/Hello");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
+        connection.setRequestMethod("PUT");
         OutputStream outputStream = connection.getOutputStream();
         outputStream.write("World".getBytes());
         connection.getInputStream();

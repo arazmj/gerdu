@@ -4,7 +4,7 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     let url = "http://localhost:8080/cache/Hello";
 
     let client = reqwest::Client::new();
-    client.post(url)
+    client.put(url)
         .body("World")
         .send()
         .await?;

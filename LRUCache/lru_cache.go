@@ -38,7 +38,7 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 	return "", false
 }
 
-func (c *LRUCache) Put(key string, value string) {
+func (c *LRUCache) Put(key string, value string) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if v, ok := c.cache[key]; ok {
@@ -46,6 +46,7 @@ func (c *LRUCache) Put(key string, value string) {
 		c.linklist.RemoveNode(node)
 		c.linklist.AddNode(node)
 		node.Value = value
+		created = false
 	} else {
 		node := &DLinkList.Node{Key: key, Value: value}
 		c.linklist.AddNode(node)
@@ -56,7 +57,9 @@ func (c *LRUCache) Put(key string, value string) {
 			tail := c.linklist.PopTail()
 			delete(c.cache, tail.Key)
 		}
+		created = true
 	}
+	return created
 }
 
 func (c *LRUCache) HasKey(key string) bool {

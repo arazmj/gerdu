@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 let host = 'http://localhost:8080/cache';
-axios.post(host + '/Hello', "World")
+axios.put(host + '/Hello', "World")
     .then(() => {
         axios.get(host + '/Hello')
             .then((response) => {

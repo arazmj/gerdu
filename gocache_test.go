@@ -23,19 +23,19 @@ func TestIndexHandler(t *testing.T) {
 			name:           "Put 1:1",
 			r:              httptest.NewRequest("PUT", "/cache/1", strings.NewReader("1")),
 			w:              httptest.NewRecorder(),
-			expectedStatus: http.StatusOK,
+			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:           "Put 2:2",
 			r:              httptest.NewRequest("PUT", "/cache/2", strings.NewReader("2")),
 			w:              httptest.NewRecorder(),
-			expectedStatus: http.StatusOK,
+			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:           "Put 3:3",
 			r:              httptest.NewRequest("PUT", "/cache/3", strings.NewReader("3")),
 			w:              httptest.NewRecorder(),
-			expectedStatus: http.StatusOK,
+			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:             "Get 2:2",

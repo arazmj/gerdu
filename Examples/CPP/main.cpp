@@ -3,27 +3,20 @@
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
-#include <boost/property_tree/ptree.hpp>
-
-#include <sstream>
 
 using namespace std;
-
-// RAII cleanup
-
-
-// Send request and get a result.
-// Here I use a shortcut to get it in a string stream ...
 
 int main() {
 
     try
     {
+        // RAII cleanup
         curlpp::Cleanup cURLppStartStop;
         curlpp::Easy post;
 
         post.setOpt(curlpp::options::Url("http://localhost/cache/Hello"));
-        post.setOpt(new curlpp::options::PostFields("World"));
+        post.setOpt(new curlpp::options::CustomRequest{"PUT"});
+        post.setOpt(new curlpp::options::PostFields ("World"));
         post.setOpt(curlpp::options::Port(8080));
         post.perform();
 

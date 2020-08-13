@@ -1,6 +1,6 @@
 package Cache
 
 type Cache interface {
-	Put(key string, value string)
+	Put(key string, value string) (created bool)
 	Get(key string) (value string, ok bool)
 }
