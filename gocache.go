@@ -57,7 +57,7 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 
 	created := cache.Put(key, value)
 	if *verbose {
-		if created {
+		if !created {
 			log.Printf("UPDATED Key: %s Value: %s\n", key, value)
 		} else {
 			log.Printf("INSERTED Key: %s Value: %s\n", key, value)
