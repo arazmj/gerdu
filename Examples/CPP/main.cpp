@@ -10,18 +10,19 @@ int main() {
 
     try
     {
+        string url = "http://localhost/cache/Hello";
         // RAII cleanup
         curlpp::Cleanup cURLppStartStop;
         curlpp::Easy post;
 
-        post.setOpt(curlpp::options::Url("http://localhost/cache/Hello"));
+        post.setOpt(curlpp::options::Url(url));
         post.setOpt(new curlpp::options::CustomRequest{"PUT"});
         post.setOpt(new curlpp::options::PostFields ("World"));
         post.setOpt(curlpp::options::Port(8080));
         post.perform();
 
         curlpp::Easy get;
-        get.setOpt(curlpp::options::Url("http://localhost/cache/Hello"));
+        get.setOpt(curlpp::options::Url(url§));
         std::stringstream response;
         get.setOpt(new curlpp::options::WriteStream(&response));
         get.setOpt(curlpp::options::Port(8080));
