@@ -19,7 +19,7 @@ import (
 )
 
 var cache Cache.Cache
-var verbose *bool
+var verbose = new(bool)
 
 func main() {
 	capacity := flag.Int("capacity", 100,
