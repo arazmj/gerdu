@@ -1,0 +1,14 @@
+name: DartGoCache
+description: A simple demo for GoCache.
+homepage: https://github.com/arazmj/GoCache
+
+environment:
+  sdk: '>=2.8.1 <3.0.0'
+
+dependencies:
+  http: 0.12.2
+
+
+dev_dependencies:
+  pedantic: ^1.9.0
+
