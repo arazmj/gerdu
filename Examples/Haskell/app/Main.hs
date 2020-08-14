@@ -1,3 +1,10 @@
+{-|
+   GoCacheHaskell Example
+
+   Created by Amir Razmjou on 8/13/20.
+   Copyright © 2020 Amir Razmjou. All rights reserved.
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
