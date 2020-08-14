@@ -1,19 +1,9 @@
-{-|
-  GoCacheHaskell Example
-
-  Created by Amir Razmjou on 8/13/20.
-  Copyright © 2020 Amir Razmjou. All rights reserved.
--}
-
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Lazy.Char8 as LC
 import Network.HTTP.Simple
-
+import Network.HTTP.Client.Types
 
 host :: BC.ByteString
 host = "localhost"

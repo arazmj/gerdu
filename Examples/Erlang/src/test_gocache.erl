@@ -14,6 +14,6 @@ test() ->
   Url = "http://localhost:8080/cache/Hello",
   httpc:request(put, {Url, [],[], "World"}, [], []),
   {ok, {{_, _, _}, _, Body}} = httpc:request(get, {Url, []}, [], []),
-  erlang. "Hello = " ++ Body.
+  "Hello = " ++ Body.
 
 
