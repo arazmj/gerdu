@@ -9,8 +9,8 @@
 module Main where
 
 import qualified Data.ByteString.Char8 as BC
-import Network.HTTP.Simple
 import Network.HTTP.Client.Types
+import Network.HTTP.Simple
 
 host :: BC.ByteString
 host = "localhost"
@@ -24,12 +24,13 @@ path = "/cache/Hello"
 value = "World"
 
 request :: BC.ByteString -> Request
-request method = setRequestMethod method
-                                  $ setRequestHost host
-                                  $ setRequestPath path
-                                  $ setRequestBody value
-                                  $ setRequestPort port
-                                  $ defaultRequest
+request method =
+  setRequestMethod method $
+    setRequestHost host $
+      setRequestPath path $
+        setRequestBody value $
+          setRequestPort port $
+            defaultRequest
 
 main :: IO ()
 main = do
@@ -38,4 +39,3 @@ main = do
   let status = getResponseStatusCode response
   let value = getResponseBody response
   print $ "Hello = " <> value
-
