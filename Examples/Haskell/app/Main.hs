@@ -25,12 +25,12 @@ value = "World"
 
 request :: BC.ByteString -> Request
 request method =
-  setRequestMethod method $
+    setRequestMethod method $
     setRequestHost host $
-      setRequestPath path $
-        setRequestBody value $
-          setRequestPort port $
-            defaultRequest
+    setRequestPath path $
+    setRequestBody value $
+    setRequestPort port $
+    defaultRequest
 
 main :: IO ()
 main = do
