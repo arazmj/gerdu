@@ -1,5 +1,7 @@
 ![](https://github.com/arazmj/GoCache/workflows/Go/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/arazmj/GoCache)](https://goreportcard.com/report/github.com/arazmj/GoCache)
+[![codecov](https://codecov.io/gh/arazmj/gocache/branch/master/graph/badge.svg)](https://codecov.io/gh/arazmj/gocache)
+
 # GoCache
 
 GoCache is a thread-safe key-value in-memory database server written in GoLang.
