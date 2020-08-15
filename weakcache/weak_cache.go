@@ -1,38 +1,41 @@
-package WeakCache
+package weakcache
 
 import (
-	"GoCache/Stats"
+	"GoCache/stats"
 	"github.com/ivanrad/go-weakref/weakref"
 	"sync"
 )
 
+// WeakCache data structure
 type WeakCache struct {
 	sync.Map
 }
 
+// NewWeakCache constructor
 func NewWeakCache() *WeakCache {
 	return &WeakCache{}
 }
 
+// Put a new key value pair
 func (c *WeakCache) Put(key string, value string) (created bool) {
-	Stats.Adds.Inc()
+	stats.Adds.Inc()
 	ref := weakref.NewWeakRef(value)
 	c.Store(key, ref)
 	return true
 }
 
+// Get value by key
 func (c *WeakCache) Get(key string) (value string, ok bool) {
 	v, ok := c.Load(key)
 	if ok {
 		ref := v.(*weakref.WeakRef)
 		if ref.IsAlive() {
-			Stats.Hits.Inc()
+			stats.Hits.Inc()
 			return ref.GetTarget().(string), true
-		} else {
-			Stats.Deletes.Inc()
-			c.Delete(key)
 		}
+		stats.Deletes.Inc()
+		c.Delete(key)
 	}
-	Stats.Miss.Inc()
+	stats.Miss.Inc()
 	return "", false
 }

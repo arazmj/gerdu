@@ -1,6 +1,7 @@
-package Cache
+package cache
 
-type Cache interface {
+// ICache cache interface
+type ICache interface {
 	Put(key string, value string) (created bool)
 	Get(key string) (value string, ok bool)
 }

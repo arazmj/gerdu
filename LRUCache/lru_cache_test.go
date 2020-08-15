@@ -1,4 +1,4 @@
-package LRUCache
+package lrucache
 
 import (
 	"github.com/inhies/go-bytesize"

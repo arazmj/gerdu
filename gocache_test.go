@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoCache/LRUCache"
+	"GoCache/lrucache"
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestIndexHandler(t *testing.T) {
-	cache = LRUCache.NewCache(2)
+	cache2 = lrucache.NewCache(2)
 	tests := []struct {
 		name             string
 		r                *http.Request
@@ -20,39 +20,39 @@ func TestIndexHandler(t *testing.T) {
 	}{
 		{
 			name:           "Put 1:1",
-			r:              httptest.NewRequest("PUT", "/cache/1", strings.NewReader("1")),
+			r:              httptest.NewRequest("PUT", "/icache/1", strings.NewReader("1")),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:           "Put 2:2",
-			r:              httptest.NewRequest("PUT", "/cache/2", strings.NewReader("2")),
+			r:              httptest.NewRequest("PUT", "/icache/2", strings.NewReader("2")),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:           "Put 3:3",
-			r:              httptest.NewRequest("PUT", "/cache/3", strings.NewReader("3")),
+			r:              httptest.NewRequest("PUT", "/icache/3", strings.NewReader("3")),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:             "Get 2:2",
-			r:                httptest.NewRequest("GET", "/cache/2", nil),
+			r:                httptest.NewRequest("GET", "/icache/2", nil),
 			w:                httptest.NewRecorder(),
 			expectedResponse: "2",
 			expectedStatus:   http.StatusOK,
 		},
 		{
 			name:             "Get 3:3",
-			r:                httptest.NewRequest("GET", "/cache/3", nil),
+			r:                httptest.NewRequest("GET", "/icache/3", nil),
 			w:                httptest.NewRecorder(),
 			expectedResponse: "3",
 			expectedStatus:   http.StatusOK,
 		},
 		{
 			name:           "Get 1:1",
-			r:              httptest.NewRequest("GET", "/cache/1", nil),
+			r:              httptest.NewRequest("GET", "/icache/1", nil),
 			w:              httptest.NewRecorder(),
 			expectedStatus: http.StatusNotFound,
 		},
@@ -62,7 +62,7 @@ func TestIndexHandler(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if strings.HasPrefix(test.name, "Put") {
 				router := mux.NewRouter()
-				router.HandleFunc("/cache/{key}", PutHandler)
+				router.HandleFunc("/icache/{key}", putHandler)
 				router.ServeHTTP(test.w, test.r)
 
 				if test.w.Code != test.expectedStatus {
@@ -70,7 +70,7 @@ func TestIndexHandler(t *testing.T) {
 				}
 			} else {
 				router := mux.NewRouter()
-				router.HandleFunc("/cache/{key}", GetHandler)
+				router.HandleFunc("/icache/{key}", getHandler)
 				router.ServeHTTP(test.w, test.r)
 
 				if test.w.Code != test.expectedStatus || test.expectedResponse != test.w.Body.String() {

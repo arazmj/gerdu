@@ -1,4 +1,4 @@
-package LFUCache
+package lfucache
 
 import (
 	"github.com/inhies/go-bytesize"

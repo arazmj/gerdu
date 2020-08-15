@@ -1,10 +1,10 @@
 package main
 
 import (
-	"GoCache/Cache"
-	"GoCache/LFUCache"
-	"GoCache/LRUCache"
-	"GoCache/WeakCache"
+	"GoCache/cache"
+	"GoCache/lfucache"
+	"GoCache/lrucache"
+	"GoCache/weakcache"
 	"bytes"
 	"flag"
 	"fmt"
@@ -18,49 +18,53 @@ import (
 	"strings"
 )
 
-var cache Cache.Cache
+var cache2 cache.ICache
 var verbose = flag.Bool("verbose", false, "verbose logging")
 
 func main() {
 	capacityStr := flag.String("capacity", "64MB",
-		"The size of cache, once cache reached this capacity old values will evicted.\n"+
+		"The size of icache, once icache reached this capacity old values will evicted.\n"+
 			"Specify a numerical value followed by one of the following units (not case sensitive)"+
 			"\nK or KB: Kilobytes"+
 			"\nM or MB: Megabytes"+
 			"\nG or GB: Gigabytes"+
 			"\nT or TB: Terabytes")
 	port := flag.Int("port", 8080, "the server port number")
-	kind := flag.String("type", "lru", "type of cache, lru or lfu, weak")
+	kind := flag.String("type", "lru", "type of icache, lru or lfu, weak")
 	flag.Parse()
 
 	capacity, _ := bytesize.Parse(*capacityStr)
 
 	if strings.ToLower(*kind) == "lru" {
-		cache = LRUCache.NewCache(capacity)
+		cache2 = lrucache.NewCache(capacity)
 	} else if strings.ToLower(*kind) == "lfu" {
-		cache = LFUCache.NewCache(capacity)
+		cache2 = lfucache.NewCache(capacity)
 	} else if strings.ToLower(*kind) == "weak" {
-		cache = WeakCache.NewWeakCache()
+		cache2 = weakcache.NewWeakCache()
 	} else {
 		fmt.Println("Invalid value for type")
 		os.Exit(1)
 	}
 	router := mux.NewRouter()
-	router.HandleFunc("/cache/{key}", GetHandler).Methods(http.MethodGet)
-	router.HandleFunc("/cache/{key}", PutHandler).Methods(http.MethodPut)
+	router.HandleFunc("/icache/{key}", getHandler).Methods(http.MethodGet)
+	router.HandleFunc("/icache/{key}", putHandler).Methods(http.MethodPut)
 	router.Handle("/metrics", promhttp.Handler())
 	log.Printf("GoCache started listening on %d port\n", *port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), router))
 }
 
-func PutHandler(w http.ResponseWriter, r *http.Request) {
+func putHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
+	_, err := buf.ReadFrom(r.Body)
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
 	value := buf.String()
 
-	created := cache.Put(key, value)
+	created := cache2.Put(key, value)
 	if *verbose {
 		if !created {
 			log.Printf("UPDATED Key: %s Value: %s\n", key, value)
@@ -75,10 +79,10 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetHandler(w http.ResponseWriter, r *http.Request) {
+func getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
-	if value, ok := cache.Get(key); ok {
+	if value, ok := cache2.Get(key); ok {
 		if *verbose {
 			log.Printf("RETREIVED Key: %s Value: %s\n", key, value)
 		}

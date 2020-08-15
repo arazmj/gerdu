@@ -1,5 +1,6 @@
-package DLinkList
+package dlinklist
 
+// Node data structure
 type Node struct {
 	next  *Node
 	prev  *Node
@@ -8,12 +9,14 @@ type Node struct {
 	Freq  int
 }
 
+// DLinkedList data structure
 type DLinkedList struct {
 	head *Node
 	tail *Node
 	Size int
 }
 
+// NewLinkedList constructor
 func NewLinkedList() *DLinkedList {
 	head := &Node{}
 	tail := &Node{}
@@ -25,6 +28,7 @@ func NewLinkedList() *DLinkedList {
 	}
 }
 
+// AddNode adds a new node to the tail of of linked list
 func (c *DLinkedList) AddNode(node *Node) {
 	next := c.head.next
 	c.head.next = node
@@ -34,6 +38,7 @@ func (c *DLinkedList) AddNode(node *Node) {
 	c.Size++
 }
 
+// RemoveNode removes a node
 func (c *DLinkedList) RemoveNode(node *Node) {
 	prev := node.prev
 	next := node.next
@@ -42,6 +47,7 @@ func (c *DLinkedList) RemoveNode(node *Node) {
 	c.Size--
 }
 
+// PopTail pops a node from the beginning of the linked list
 func (c *DLinkedList) PopTail() *Node {
 	prev := c.tail.prev
 	c.RemoveNode(prev)

@@ -1,4 +1,4 @@
-package WeakCache
+package weakcache
 
 import (
 	"runtime"
