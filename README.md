@@ -1,3 +1,5 @@
+![](https://github.com/ekpangmichael/github-ci/workflows/CI/badge.svg)
+
 # GoCache
 
 GoCache is a thread-safe key-value in-memory database server written in GoLang.
