@@ -1,3 +1,4 @@
+#installed.packages("RCurl")
 url <- "http://localhost:8080/cache/Hello"
 httpPUT(url, "World")
 response <- httpGET(url)
