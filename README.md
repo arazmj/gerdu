@@ -1,4 +1,4 @@
-![](https://github.com/arazmj/GoCache/workflows/CI/badge.svg)
+![](https://github.com/arazmj/GoCache/workflows/Go/badge.svg)
 
 # GoCache
 
