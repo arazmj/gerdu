@@ -1,4 +1,4 @@
-![](https://github.com/arazmj/ferdu/workflows/Go/badge.svg)
+![](https://github.com/arazmj/gerdu/workflows/Go/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/arazmj/gerdu)](https://goreportcard.com/report/github.com/arazmj/Gerdu)
 [![codecov](https://codecov.io/gh/arazmj/gerdu/branch/master/graph/badge.svg)](https://codecov.io/gh/arazmj/gocache)
 
