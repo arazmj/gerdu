@@ -35,3 +35,7 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: github-action-publish-binaries
+      uses: skx/github-action-publish-binaries@release-0.14
+
