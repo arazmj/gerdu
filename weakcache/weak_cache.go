@@ -1,7 +1,7 @@
 package weakcache
 
 import (
-	"GoCache/stats"
+	"github.com/arazmj/gocache/stats"
 	"github.com/ivanrad/go-weakref/weakref"
 	"sync"
 )

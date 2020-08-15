@@ -1,9 +1,9 @@
 package lrucache
 
 import (
-	"GoCache/cache"
-	"GoCache/dlinklist"
-	"GoCache/stats"
+	"github.com/arazmj/gocache/cache"
+	"github.com/arazmj/gocache/dlinklist"
+	"github.com/arazmj/gocache/stats"
 	"github.com/inhies/go-bytesize"
 	"sync"
 )

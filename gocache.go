@@ -1,13 +1,13 @@
 package main
 
 import (
-	"GoCache/cache"
-	"GoCache/lfucache"
-	"GoCache/lrucache"
-	"GoCache/weakcache"
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/arazmj/gocache/cache"
+	"github.com/arazmj/gocache/lfucache"
+	"github.com/arazmj/gocache/lrucache"
+	"github.com/arazmj/gocache/weakcache"
 	"github.com/gorilla/mux"
 	"github.com/inhies/go-bytesize"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

@@ -1,4 +1,4 @@
-module GoCache
+module github.com/arazmj/gocache
 
 go 1.14
 
