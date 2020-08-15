@@ -8,15 +8,14 @@ import (
 
 type WeakCache struct {
 	sync.Map
-	stats *Stats.Stats
 }
 
-func NewWeakCache(stats *Stats.Stats) *WeakCache {
-	return &WeakCache{stats: stats}
+func NewWeakCache() *WeakCache {
+	return &WeakCache{}
 }
 
 func (c *WeakCache) Put(key string, value string) (created bool) {
-	c.stats.AddOps()
+	Stats.Adds.Inc()
 	ref := weakref.NewWeakRef(value)
 	c.Store(key, ref)
 	return true
@@ -27,13 +26,13 @@ func (c *WeakCache) Get(key string) (value string, ok bool) {
 	if ok {
 		ref := v.(*weakref.WeakRef)
 		if ref.IsAlive() {
-			c.stats.HitOps()
+			Stats.Hits.Inc()
 			return ref.GetTarget().(string), true
 		} else {
-			c.stats.DeleteOps()
+			Stats.Deletes.Inc()
 			c.Delete(key)
 		}
 	}
-	c.stats.MissOps()
+	Stats.Miss.Inc()
 	return "", false
 }

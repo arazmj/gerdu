@@ -8,5 +8,5 @@ requests.put("%s:%s/cache/Hello" % (url, port), "World")
 
 # get the value for 'Hello' key
 response = requests.get("%s:%s/cache/Hello" % (url, port))
-print("Hello = ", response.text)
+print("Hello =", response.text)
 

@@ -7,7 +7,7 @@ import (
 )
 
 func TestWeakCache(t *testing.T) {
-	cache := NewWeakCache(nil)
+	cache := NewWeakCache()
 
 	c := 500
 	for i := 0; i < c; i++ {

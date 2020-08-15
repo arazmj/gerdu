@@ -4,7 +4,6 @@ import (
 	"GoCache/Cache"
 	"GoCache/LFUCache"
 	"GoCache/LRUCache"
-	"GoCache/Stats"
 	"GoCache/WeakCache"
 	"bytes"
 	"flag"
@@ -36,13 +35,12 @@ func main() {
 
 	capacity, _ := bytesize.Parse(*capacityStr)
 
-	stats := Stats.NewStats()
 	if strings.ToLower(*kind) == "lru" {
-		cache = LRUCache.NewCache(capacity, stats)
+		cache = LRUCache.NewCache(capacity)
 	} else if strings.ToLower(*kind) == "lfu" {
-		cache = LFUCache.NewCache(capacity, stats)
+		cache = LFUCache.NewCache(capacity)
 	} else if strings.ToLower(*kind) == "weak" {
-		cache = WeakCache.NewWeakCache(stats)
+		cache = WeakCache.NewWeakCache()
 	} else {
 		fmt.Println("Invalid value for type")
 		os.Exit(1)

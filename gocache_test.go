@@ -2,7 +2,6 @@ package main
 
 import (
 	"GoCache/LRUCache"
-	"GoCache/Stats"
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +10,7 @@ import (
 )
 
 func TestIndexHandler(t *testing.T) {
-	cache = LRUCache.NewCache(2, Stats.NewStats())
+	cache = LRUCache.NewCache(2)
 	tests := []struct {
 		name             string
 		r                *http.Request

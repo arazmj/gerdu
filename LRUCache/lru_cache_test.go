@@ -1,7 +1,6 @@
 package LRUCache
 
 import (
-	"GoCache/Stats"
 	"github.com/inhies/go-bytesize"
 	"math/rand"
 	"strconv"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestLRUCache(t *testing.T) {
-	cache := NewCache(2, Stats.NewStats())
+	cache := NewCache(2)
 	cache.Put("1", "1")
 	cache.Put("2", "2")
 	cache.Put("3", "3")
@@ -27,7 +26,7 @@ func TestLRUCache(t *testing.T) {
 
 func TestThreadSafety(t *testing.T) {
 	capacity, _ := bytesize.Parse("100B")
-	cache := NewCache(capacity, Stats.NewStats())
+	cache := NewCache(capacity)
 	var wg sync.WaitGroup
 	c := 200
 	wg.Add(c)
@@ -50,7 +49,7 @@ func TestThreadSafety(t *testing.T) {
 }
 
 func BenchmarkLRUCache(b *testing.B) {
-	cache := NewCache(100, Stats.NewStats())
+	cache := NewCache(100)
 	for i := 0; i < b.N; i++ {
 		key := strconv.Itoa(rand.Int())
 		value := strconv.Itoa(rand.Int())

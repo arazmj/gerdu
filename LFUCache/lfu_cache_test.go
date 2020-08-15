@@ -1,7 +1,6 @@
 package LFUCache
 
 import (
-	"GoCache/Stats"
 	"github.com/inhies/go-bytesize"
 	"math/rand"
 	"strconv"
@@ -22,7 +21,7 @@ func RandStringRunes(n int) string {
 
 func TestThreadSafety(t *testing.T) {
 	capacity, _ := bytesize.Parse("3KB")
-	cache := NewCache(capacity, Stats.NewStats())
+	cache := NewCache(capacity)
 	var wg sync.WaitGroup
 	c := 300
 	wg.Add(c)
@@ -47,7 +46,7 @@ func TestThreadSafety(t *testing.T) {
 func TestNewLFUCache(t *testing.T) {
 	c := 100
 	size := bytesize.ByteSize(10 + 2*10*9)
-	cache := NewCache(size, Stats.NewStats()).(*LFUCache)
+	cache := NewCache(size).(*LFUCache)
 	for i := 0; i < c; i++ {
 		itoa := strconv.Itoa(i)
 		cache.Put(itoa, itoa)
@@ -99,7 +98,7 @@ func TestNewLFUCache(t *testing.T) {
 }
 
 func TestLFUCache_Update(t *testing.T) {
-	cache := NewCache(10, Stats.NewStats()).(*LFUCache)
+	cache := NewCache(10).(*LFUCache)
 	cache.Put("20", "20")
 	if cache.freq[1].Size != 1 {
 		t.Errorf("Expected size of 1")
@@ -126,7 +125,7 @@ func TestLFUCache_Update(t *testing.T) {
 }
 
 func TestNewCache2(t *testing.T) {
-	cache := NewCache(10, Stats.NewStats()).(*LFUCache)
+	cache := NewCache(10).(*LFUCache)
 
 	cache.Put("1", "1")
 	cache.Put("2", "1")
@@ -139,7 +138,7 @@ func TestNewCache2(t *testing.T) {
 
 	_, ok := cache.Get("1")
 	if ok {
-		t.Errorf("1 needs to be efecited.")
+		t.Errorf("1 needs to be evicted.")
 	}
 
 	_, ok = cache.Get("2")

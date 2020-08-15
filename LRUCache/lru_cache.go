@@ -10,16 +10,14 @@ import (
 
 type LRUCache struct {
 	sync.RWMutex
-	stats    Stats.StatUpdater
 	cache    map[string]*DLinkList.Node
 	linklist *DLinkList.DLinkedList
 	capacity bytesize.ByteSize
 	size     bytesize.ByteSize
 }
 
-func NewCache(capacity bytesize.ByteSize, stats Stats.StatUpdater) Cache.Cache {
+func NewCache(capacity bytesize.ByteSize) Cache.Cache {
 	return &LRUCache{
-		stats:    stats,
 		cache:    map[string]*DLinkList.Node{},
 		linklist: DLinkList.NewLinkedList(),
 		capacity: capacity,
@@ -31,13 +29,13 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 	if value, ok := c.cache[key]; ok {
-		c.stats.HitOps()
+		Stats.Hits.Inc()
 		node := value
 		c.linklist.RemoveNode(node)
 		c.linklist.AddNode(node)
 		return node.Value, true
 	}
-	c.stats.MissOps()
+	Stats.Miss.Inc()
 	return "", false
 }
 
@@ -54,10 +52,10 @@ func (c *LRUCache) Put(key string, value string) (created bool) {
 		node := &DLinkList.Node{Key: key, Value: value}
 		c.linklist.AddNode(node)
 		c.cache[key] = node
-		c.stats.AddOps()
+		Stats.Adds.Inc()
 		c.size += bytesize.ByteSize(len(value))
 		for c.size > c.capacity {
-			c.stats.DeleteOps()
+			Stats.Deletes.Inc()
 			tail := c.linklist.PopTail()
 			c.size -= bytesize.ByteSize(len(tail.Value))
 			delete(c.cache, tail.Key)

@@ -10,7 +10,6 @@ import (
 
 type LFUCache struct {
 	sync.Mutex
-	stats    *Stats.Stats
 	size     bytesize.ByteSize
 	capacity bytesize.ByteSize
 	node     map[string]*DLinkList.Node
@@ -18,11 +17,10 @@ type LFUCache struct {
 	minFreq  int
 }
 
-func NewCache(capacity bytesize.ByteSize, stats *Stats.Stats) Cache.Cache {
+func NewCache(capacity bytesize.ByteSize) Cache.Cache {
 	return &LFUCache{
 		size:     0,
 		capacity: capacity,
-		stats:    stats,
 		node:     map[string]*DLinkList.Node{},
 		freq:     map[int]*DLinkList.DLinkedList{},
 		minFreq:  0,
@@ -77,11 +75,11 @@ func (c *LFUCache) Get(key string) (value string, ok bool) {
 	c.Lock()
 
 	if _, ok := c.node[key]; !ok {
-		c.stats.MissOps()
+		Stats.Miss.Inc()
 		return "", false
 	}
 
-	c.stats.HitOps()
+	Stats.Hits.Inc()
 	node := c.node[key]
 	c.update(node)
 	return node.Value, true
@@ -110,15 +108,23 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 		return
 	}
 	if _, ok := c.node[key]; ok {
-		c.stats.HitOps()
+		Stats.Hits.Inc()
 		node := c.node[key]
 		c.update(node)
 		node.Value = value
 		created = false
 	} else {
+		c.size += bytesize.ByteSize(len(value))
 		for c.size > c.capacity {
-			c.stats.DeleteOps()
-			minList := c.freq[c.minFreq]
+			Stats.Deletes.Inc()
+			minList, ok := c.freq[c.minFreq]
+
+			if !ok || minList.Size == 0 {
+				delete(c.freq, c.minFreq)
+				c.minFreq++
+				continue
+			}
+
 			node := minList.PopTail()
 			freq := node.Freq
 			if v, _ := c.freq[c.minFreq]; c.minFreq == freq && v.Size == 0 {
@@ -128,7 +134,7 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 			c.size -= bytesize.ByteSize(len(node.Value))
 			delete(c.node, node.Key)
 		}
-		c.stats.AddOps()
+		Stats.Adds.Inc()
 		node := &DLinkList.Node{
 			Key:   key,
 			Value: value,
@@ -138,7 +144,6 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 		if _, ok := c.freq[1]; !ok {
 			c.freq[1] = DLinkList.NewLinkedList()
 		}
-		c.size += bytesize.ByteSize(len(value))
 
 		c.freq[1].AddNode(node)
 		c.minFreq = 1
