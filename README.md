@@ -1,14 +1,14 @@
-![](https://github.com/arazmj/GoCache/workflows/Go/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/arazmj/GoCache)](https://goreportcard.com/report/github.com/arazmj/GoCache)
-[![codecov](https://codecov.io/gh/arazmj/gocache/branch/master/graph/badge.svg)](https://codecov.io/gh/arazmj/gocache)
+![](https://github.com/arazmj/ferdu/workflows/Go/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/arazmj/gerdu)](https://goreportcard.com/report/github.com/arazmj/Gerdu)
+[![codecov](https://codecov.io/gh/arazmj/gerdu/branch/master/graph/badge.svg)](https://codecov.io/gh/arazmj/gocache)
 
-# GoCache
+# Gerdu
 
-GoCache is a thread-safe key-value in-memory database server written in GoLang.
-Currently it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used). 
+Gerdu is a thread-safe key-value in-memory database server written in GoLang.
+Currently, it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used). 
 It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
 ```
-   -capacity string
+  -capacity string
         The size of cache, once cache reached this capacity old values will evicted.
         Specify a numerical value followed by one of the following units (not case sensitive)
         K or KB: Kilobytes
@@ -44,5 +44,4 @@ curl --request GET localhost:8080/metrics
 
 Sample application s available in:
 
-C++             Dart            Erlang          Groovy          Java            NodeJS          PHP             Python          Ruby            Scala
-C#          Elixir          GoLang          Haskell         Kotlin          Objective-C     Perl            R               Rust            Swift
+C++, Dart, Erlang, Groovy, Java, NodeJS, PHP, Python, Ruby, Scala ,C# ,Elixir ,GoLang ,Haskell ,Kotlin ,Objective-C ,Perl ,R ,Rust ,Swift

@@ -1,4 +1,4 @@
-module github.com/arazmj/gocache
+module github.com/arazmj/gerdu
 
 go 1.14
 

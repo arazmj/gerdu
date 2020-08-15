@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/arazmj/gocache/cache"
-	"github.com/arazmj/gocache/lfucache"
-	"github.com/arazmj/gocache/lrucache"
-	"github.com/arazmj/gocache/weakcache"
+	"github.com/arazmj/gerdu/cache"
+	"github.com/arazmj/gerdu/lfucache"
+	"github.com/arazmj/gerdu/lrucache"
+	"github.com/arazmj/gerdu/weakcache"
 	"github.com/gorilla/mux"
 	"github.com/inhies/go-bytesize"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -49,7 +49,7 @@ func main() {
 	router.HandleFunc("/icache/{key}", getHandler).Methods(http.MethodGet)
 	router.HandleFunc("/icache/{key}", putHandler).Methods(http.MethodPut)
 	router.Handle("/metrics", promhttp.Handler())
-	log.Printf("GoCache started listening on %d port\n", *port)
+	log.Printf("Gerdu started listening on %d port\n", *port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), router))
 }
 

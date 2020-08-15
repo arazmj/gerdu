@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/arazmj/gocache/lrucache"
+	"github.com/arazmj/gerdu/lrucache"
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
