@@ -2,6 +2,7 @@ package LRUCache
 
 import (
 	"GoCache/Stats"
+	"github.com/inhies/go-bytesize"
 	"math/rand"
 	"strconv"
 	"sync"
@@ -25,7 +26,7 @@ func TestLRUCache(t *testing.T) {
 }
 
 func TestThreadSafety(t *testing.T) {
-	capacity := 300
+	capacity, _ := bytesize.Parse("100B")
 	cache := NewCache(capacity, Stats.NewStats())
 	var wg sync.WaitGroup
 	c := 200

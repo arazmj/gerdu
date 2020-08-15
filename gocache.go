@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/inhies/go-bytesize"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
@@ -19,21 +20,27 @@ import (
 )
 
 var cache Cache.Cache
-var verbose = new(bool)
+var verbose = flag.Bool("verbose", false, "verbose logging")
 
 func main() {
-	capacity := flag.Int("capacity", 100,
-		"how big the cache will be, the old values will be evicted")
+	capacityStr := flag.String("capacity", "64MB",
+		"The size of cache, once cache reached this capacity old values will evicted.\n"+
+			"Specify a numerical value followed by one of the following units (not case sensitive)"+
+			"\nK or KB: Kilobytes"+
+			"\nM or MB: Megabytes"+
+			"\nG or GB: Gigabytes"+
+			"\nT or TB: Terabytes")
 	port := flag.Int("port", 8080, "the server port number")
 	kind := flag.String("type", "lru", "type of cache, lru or lfu, weak")
-	verbose = flag.Bool("verbose", false, "verbose logging")
 	flag.Parse()
+
+	capacity, _ := bytesize.Parse(*capacityStr)
 
 	stats := Stats.NewStats()
 	if strings.ToLower(*kind) == "lru" {
-		cache = LRUCache.NewCache(*capacity, stats)
+		cache = LRUCache.NewCache(capacity, stats)
 	} else if strings.ToLower(*kind) == "lfu" {
-		cache = LFUCache.NewCache(*capacity, stats)
+		cache = LFUCache.NewCache(capacity, stats)
 	} else if strings.ToLower(*kind) == "weak" {
 		cache = WeakCache.NewWeakCache(stats)
 	} else {

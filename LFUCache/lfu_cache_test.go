@@ -2,27 +2,41 @@ package LFUCache
 
 import (
 	"GoCache/Stats"
+	"github.com/inhies/go-bytesize"
+	"math/rand"
 	"strconv"
 	"sync"
 	"testing"
 )
 
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandStringRunes(n int) string {
+	rand.Seed(int64(n))
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
 func TestThreadSafety(t *testing.T) {
-	capacity := 300
+	capacity, _ := bytesize.Parse("3KB")
 	cache := NewCache(capacity, Stats.NewStats())
 	var wg sync.WaitGroup
-	c := 200
+	c := 300
 	wg.Add(c)
 
 	for i := 0; i < c; i++ {
 		go func(i int) {
 			defer wg.Done()
 			for j := 0; j < c; j++ {
-				key := strconv.Itoa((i + 1) * j)
+				key := RandStringRunes((i + 1) + j)
 				cache.Put(key, key)
-				value, ok := cache.Get(key)
-				if ok && value != key {
-					t.Errorf("The value is not the same %s", value)
+				newValue, ok := cache.Get(key)
+				if ok && key != newValue {
+					t.Errorf("The value is not the same for the key %s \n%s",
+						key, newValue)
 				}
 			}
 		}(i)
@@ -32,7 +46,8 @@ func TestThreadSafety(t *testing.T) {
 }
 func TestNewLFUCache(t *testing.T) {
 	c := 100
-	cache := NewCache(c, nil).(*LFUCache)
+	size := bytesize.ByteSize(10 + 2*10*9)
+	cache := NewCache(size, Stats.NewStats()).(*LFUCache)
 	for i := 0; i < c; i++ {
 		itoa := strconv.Itoa(i)
 		cache.Put(itoa, itoa)
@@ -41,8 +56,10 @@ func TestNewLFUCache(t *testing.T) {
 	for i := 0; i < c; i++ {
 		itoa := strconv.Itoa(i)
 		value, ok := cache.Get(itoa)
-		if !ok || value != itoa {
-			t.Errorf("Bad result on %s", itoa)
+		if !ok {
+			t.Errorf("Shouldn't evict %s", itoa)
+		} else if value != itoa {
+			t.Errorf("Does not match %s", itoa)
 		}
 	}
 
@@ -74,35 +91,15 @@ func TestNewLFUCache(t *testing.T) {
 		t.Errorf("%s is not available", newValue)
 	}
 
-	_, ok = cache.Get("1")
+	_, ok = cache.Get("0")
 	if ok {
 		t.Errorf("0 needs to be evecited by now")
 	}
 
-	for i := c; i < c+c/2; i++ {
-		itoa := strconv.Itoa(i)
-		cache.Put(itoa, itoa)
-		cache.Get(itoa)
-		cache.Get(itoa)
-	}
-
-	for i := 0; i < c+c/2; i++ {
-		itoa := strconv.Itoa(i)
-		_, ok := cache.Get(itoa)
-		if i < c/2 {
-			if ok {
-				t.Errorf("Expected %d to be evicted", i)
-			}
-		} else {
-			if !ok {
-				t.Errorf("Expected %d to stay", i)
-			}
-		}
-	}
 }
 
 func TestLFUCache_Update(t *testing.T) {
-	cache := NewCache(10, nil).(*LFUCache)
+	cache := NewCache(10, Stats.NewStats()).(*LFUCache)
 	cache.Put("20", "20")
 	if cache.freq[1].Size != 1 {
 		t.Errorf("Expected size of 1")
@@ -125,6 +122,49 @@ func TestLFUCache_Update(t *testing.T) {
 	_, ok := cache.Get("0")
 	if ok {
 		t.Errorf("Expected 0 to be already removed")
+	}
+}
+
+func TestNewCache2(t *testing.T) {
+	cache := NewCache(10, Stats.NewStats()).(*LFUCache)
+
+	cache.Put("1", "1")
+	cache.Put("2", "1")
+	cache.Put("3", "1")
+	cache.Put("4", "1")
+	cache.Put("5", "1")
+	cache.Put("7", "1")
+	cache.Put("8", "1")
+	cache.Put("9", "12345")
+
+	_, ok := cache.Get("1")
+	if ok {
+		t.Errorf("1 needs to be efecited.")
+	}
+
+	_, ok = cache.Get("2")
+	if ok {
+		t.Errorf("2 needs to be efecited.")
+	}
+
+	_, ok = cache.Get("3")
+
+	if !ok {
+		t.Errorf("3 should not be eficted")
+	}
+
+	cache.Put("10", "1")
+
+	_, ok = cache.Get("3")
+
+	if !ok {
+		t.Errorf("3 should not be eficted")
+	}
+
+	_, ok = cache.Get("4")
+
+	if ok {
+		t.Errorf("4 should be eficted")
 	}
 
 }

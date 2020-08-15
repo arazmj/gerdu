@@ -4,20 +4,21 @@ import (
 	"GoCache/Cache"
 	"GoCache/DLinkList"
 	"GoCache/Stats"
+	"github.com/inhies/go-bytesize"
 	"sync"
 )
 
 type LFUCache struct {
 	sync.Mutex
 	stats    *Stats.Stats
-	size     int
-	capacity int
+	size     bytesize.ByteSize
+	capacity bytesize.ByteSize
 	node     map[string]*DLinkList.Node
 	freq     map[int]*DLinkList.DLinkedList
 	minFreq  int
 }
 
-func NewCache(capacity int, stats *Stats.Stats) Cache.Cache {
+func NewCache(capacity bytesize.ByteSize, stats *Stats.Stats) Cache.Cache {
 	return &LFUCache{
 		size:     0,
 		capacity: capacity,
@@ -56,7 +57,7 @@ func (c *LFUCache) update(node *DLinkList.Node) {
 	c.freq[freq].RemoveNode(node)
 	if v, _ := c.freq[freq]; c.minFreq == freq && v.Size == 0 {
 		delete(c.freq, freq)
-		c.minFreq += 1
+		c.minFreq++
 	}
 
 	node.Freq++
@@ -115,11 +116,17 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 		node.Value = value
 		created = false
 	} else {
-		if c.size == c.capacity {
+		for c.size > c.capacity {
 			c.stats.DeleteOps()
-			node := c.freq[c.minFreq].PopTail()
+			minList := c.freq[c.minFreq]
+			node := minList.PopTail()
+			freq := node.Freq
+			if v, _ := c.freq[c.minFreq]; c.minFreq == freq && v.Size == 0 {
+				delete(c.freq, freq)
+				c.minFreq++
+			}
+			c.size -= bytesize.ByteSize(len(node.Value))
 			delete(c.node, node.Key)
-			c.size--
 		}
 		c.stats.AddOps()
 		node := &DLinkList.Node{
@@ -131,9 +138,10 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 		if _, ok := c.freq[1]; !ok {
 			c.freq[1] = DLinkList.NewLinkedList()
 		}
+		c.size += bytesize.ByteSize(len(value))
+
 		c.freq[1].AddNode(node)
 		c.minFreq = 1
-		c.size++
 		created = true
 	}
 	return created

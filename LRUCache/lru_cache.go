@@ -4,6 +4,7 @@ import (
 	"GoCache/Cache"
 	"GoCache/DLinkList"
 	"GoCache/Stats"
+	"github.com/inhies/go-bytesize"
 	"sync"
 )
 
@@ -12,15 +13,17 @@ type LRUCache struct {
 	stats    Stats.StatUpdater
 	cache    map[string]*DLinkList.Node
 	linklist *DLinkList.DLinkedList
-	capacity int
+	capacity bytesize.ByteSize
+	size     bytesize.ByteSize
 }
 
-func NewCache(capacity int, stats Stats.StatUpdater) Cache.Cache {
+func NewCache(capacity bytesize.ByteSize, stats Stats.StatUpdater) Cache.Cache {
 	return &LRUCache{
 		stats:    stats,
 		cache:    map[string]*DLinkList.Node{},
 		linklist: DLinkList.NewLinkedList(),
 		capacity: capacity,
+		size:     0,
 	}
 }
 
@@ -52,9 +55,11 @@ func (c *LRUCache) Put(key string, value string) (created bool) {
 		c.linklist.AddNode(node)
 		c.cache[key] = node
 		c.stats.AddOps()
-		if len(c.cache) > c.capacity {
+		c.size += bytesize.ByteSize(len(value))
+		for c.size > c.capacity {
 			c.stats.DeleteOps()
 			tail := c.linklist.PopTail()
+			c.size -= bytesize.ByteSize(len(tail.Value))
 			delete(c.cache, tail.Key)
 		}
 		created = true
