@@ -8,4 +8,5 @@ require (
 	github.com/inhies/go-bytesize v0.0.0-20200716184324-4fe85e9b81b2
 	github.com/ivanrad/go-weakref v0.0.0-20191223224940-5f7e82d09daf
 	github.com/prometheus/client_golang v1.7.1
+	google.golang.org/grpc v1.31.0
 )

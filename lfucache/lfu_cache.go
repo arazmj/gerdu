@@ -19,7 +19,7 @@ type LFUCache struct {
 }
 
 // NewCache LFUCache constructor
-func NewCache(capacity bytesize.ByteSize) cache.ICache {
+func NewCache(capacity bytesize.ByteSize) cache.UnImplementedCache {
 	return &LFUCache{
 		size:     0,
 		capacity: capacity,
