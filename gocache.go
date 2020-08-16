@@ -1,23 +1,16 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/arazmj/gerdu/cache"
+	"github.com/arazmj/gerdu/grpcserver"
 	"github.com/arazmj/gerdu/httpserver"
 	"github.com/arazmj/gerdu/lfucache"
 	"github.com/arazmj/gerdu/lrucache"
-	"github.com/arazmj/gerdu/proto"
 	"github.com/arazmj/gerdu/weakcache"
 	"github.com/inhies/go-bytesize"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"log"
-	"net"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -73,72 +66,16 @@ func main() {
 	if strings.Contains(*protocols, "grpc") {
 		wg.Add(1)
 		go func() {
-			grpcServer()
+			defer wg.Done()
+			if secure {
+				grpcserver.GrpcServeTLS(*grpcPort, *tlsCert, *tlsKey, gerdu, *verbose)
+			} else {
+				grpcserver.GrpcServe(*grpcPort, gerdu, *verbose)
+			}
 		}()
 	} else {
 		fmt.Println("Invalid value for protocol")
 		os.Exit(1)
 	}
 	wg.Wait()
-}
-
-func grpcServer() {
-	defer wg.Done()
-	host := ":" + strconv.Itoa(*grpcPort)
-	lis, err := net.Listen("tcp", host)
-	log.Printf("Gerdu started listening gRPC on %d port\n", *grpcPort)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	var s *grpc.Server
-	if len(*tlsCert) > 0 && len(*tlsKey) > 0 {
-		credentials, err := credentials.NewServerTLSFromFile(*tlsCert, *tlsKey)
-		if err != nil {
-			log.Fatalf("Failed to setup TLS for gRPC service: %v", err)
-		}
-
-		s = grpc.NewServer(grpc.Creds(credentials))
-	} else {
-		s = grpc.NewServer()
-	}
-	proto.RegisterGerduServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-}
-
-type server struct {
-	proto.UnimplementedGerduServer
-}
-
-func (s *server) Put(ctx context.Context, request *proto.PutRequest) (*proto.PutResponse, error) {
-	value := string(request.Value)
-	key := request.Key
-	created := gerdu.Put(key, value)
-	if *verbose {
-		if !created {
-			log.Printf("gRPC UPDATE Key: %s Value: %s\n", key, value)
-		} else {
-			log.Printf("gRPC INSERT Key: %s Value: %s\n", key, value)
-		}
-	}
-	return &proto.PutResponse{
-		Created: created,
-	}, nil
-}
-
-func (s *server) Get(ctx context.Context, request *proto.GetRequest) (*proto.GetResponse, error) {
-	value, ok := gerdu.Get(request.Key)
-	if ok {
-		if *verbose {
-			log.Printf("gRPC RETREIVED Key: %s Value: %s\n", request.Key, value)
-		}
-		return &proto.GetResponse{
-			Value: []byte(value),
-		}, nil
-	}
-	if *verbose {
-		log.Printf("gRPC MISSED Key: %s \n", value)
-	}
-	return nil, errors.New("key not found")
 }

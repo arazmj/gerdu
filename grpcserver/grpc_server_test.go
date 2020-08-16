@@ -1,4 +1,4 @@
-package main
+package grpcserver
 
 import (
 	"context"
@@ -18,7 +18,10 @@ var lis *bufconn.Listener
 func init() {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
-	proto.RegisterGerduServer(s, &server{})
+	proto.RegisterGerduServer(s, &server{
+		gerdu:   lrucache.NewCache(1000),
+		verbose: false,
+	})
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("Server exited with error: %v", err)
@@ -31,7 +34,6 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 }
 
 func TestServerGrpc(t *testing.T) {
-	gerdu = lrucache.NewCache(1000)
 	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
 	if err != nil {
