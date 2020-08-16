@@ -22,7 +22,7 @@ var lis *bufconn.Listener
 func init() {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
-	proto.RegisterCacheServer(s, &server{})
+	proto.RegisterGerduServer(s, &server{})
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("Server exited with error: %v", err)
@@ -116,7 +116,7 @@ func TestServerGrpc(t *testing.T) {
 		t.Fatalf("Failed to dial bufnet: %v", err)
 	}
 	defer conn.Close()
-	client := proto.NewCacheClient(conn)
+	client := proto.NewGerduClient(conn)
 	resp, err := client.Put(ctx, &proto.PutRequest{
 		Key:   "Key1",
 		Value: []byte("Value1"),

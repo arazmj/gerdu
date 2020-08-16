@@ -9,4 +9,5 @@ require (
 	github.com/ivanrad/go-weakref v0.0.0-20191223224940-5f7e82d09daf
 	github.com/prometheus/client_golang v1.7.1
 	google.golang.org/grpc v1.31.0
+	google.golang.org/protobuf v1.23.0
 )
