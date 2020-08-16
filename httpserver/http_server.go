@@ -19,6 +19,9 @@ func httpServe(httpPort int, gerdu cache.UnImplementedCache, verbose bool) (host
 	router.HandleFunc("/cache/{key}", func(w http.ResponseWriter, r *http.Request) {
 		putHandler(w, r, gerdu, verbose)
 	}).Methods(http.MethodPut)
+	router.HandleFunc("/cache/{key}", func(w http.ResponseWriter, r *http.Request) {
+		deleteHandler(w, r, gerdu, verbose)
+	}).Methods(http.MethodDelete)
 	router.Handle("/metrics", promhttp.Handler())
 	return host, router
 }
@@ -70,6 +73,22 @@ func getHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplemente
 		}
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(value))
+	} else {
+		if verbose {
+			log.Printf("HTTP MISSED Key: %s \n", key)
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache, verbose bool) {
+	vars := mux.Vars(r)
+	key := vars["key"]
+	if ok := gerdu.Delete(key); ok {
+		if verbose {
+			log.Printf("HTTP DELETED Key: %s\n", key)
+		}
+		w.WriteHeader(http.StatusOK)
 	} else {
 		if verbose {
 			log.Printf("HTTP MISSED Key: %s \n", key)

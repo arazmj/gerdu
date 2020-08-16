@@ -44,15 +44,17 @@ Usage of gerdu:
 ## Example
 Example of usage:
 To insert or update a key 
-```
+```Bash
 curl --request PUT --data '1' http://localhost:8080/cache/1
 curl --request PUT --data '2' http://localhost:8080/cache/2
 curl --request PUT --data '3' http://localhost:8080/cache/3
 curl --request PUT --data 'some new value' http://localhost:8080/cache/3
+curl --request DELETE http://localhost:8080/cache/3 # Delete key 3
+curl --request GET localhost:8080/cache/3 # Not found 404
 ```
 
 To retrieve the key
-```
+```Bash
 curl --request GET localhost:8080/cache/3
 ```
 
