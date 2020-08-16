@@ -1,3 +1,4 @@
+// This package implement LFU (Least Frequently Used) cache
 package lfucache
 
 import (

@@ -1,3 +1,4 @@
+// General interface for cache
 package cache
 
 // UnImplementedCache cache interface
