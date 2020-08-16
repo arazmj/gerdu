@@ -4,7 +4,7 @@ package lfucache
 import (
 	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/dlinklist"
-	"github.com/arazmj/gerdu/stats"
+	"github.com/arazmj/gerdu/metrics"
 	"github.com/inhies/go-bytesize"
 	"sync"
 )
@@ -73,11 +73,11 @@ func (c *LFUCache) Get(key string) (value string, ok bool) {
 	c.Lock()
 
 	if _, ok := c.node[key]; !ok {
-		stats.Miss.Inc()
+		metrics.Miss.Inc()
 		return "", false
 	}
 
-	stats.Hits.Inc()
+	metrics.Hits.Inc()
 	node := c.node[key]
 	c.update(node)
 	return node.Value, true
@@ -103,7 +103,7 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 		return
 	}
 	if _, ok := c.node[key]; ok {
-		stats.Hits.Inc()
+		metrics.Hits.Inc()
 		node := c.node[key]
 		c.update(node)
 		node.Value = value
@@ -111,7 +111,7 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 	} else {
 		c.size += bytesize.ByteSize(len(value))
 		for c.size > c.capacity {
-			stats.Deletes.Inc()
+			metrics.Deletes.Inc()
 			minList, ok := c.freq[c.minFreq]
 
 			if !ok || minList.Size == 0 {
@@ -129,7 +129,7 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 			c.size -= bytesize.ByteSize(len(node.Value))
 			delete(c.node, node.Key)
 		}
-		stats.Adds.Inc()
+		metrics.Adds.Inc()
 		node := &dlinklist.Node{
 			Key:   key,
 			Value: value,

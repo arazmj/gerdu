@@ -4,7 +4,7 @@ package lrucache
 import (
 	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/dlinklist"
-	"github.com/arazmj/gerdu/stats"
+	"github.com/arazmj/gerdu/metrics"
 	"github.com/inhies/go-bytesize"
 	"sync"
 )
@@ -33,13 +33,13 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 	if value, ok := c.cache[key]; ok {
-		stats.Hits.Inc()
+		metrics.Hits.Inc()
 		node := value
 		c.linklist.RemoveNode(node)
 		c.linklist.AddNode(node)
 		return node.Value, true
 	}
-	stats.Miss.Inc()
+	metrics.Miss.Inc()
 	return "", false
 }
 
@@ -58,10 +58,10 @@ func (c *LRUCache) Put(key string, value string) (created bool) {
 		node := &dlinklist.Node{Key: key, Value: value}
 		c.linklist.AddNode(node)
 		c.cache[key] = node
-		stats.Adds.Inc()
+		metrics.Adds.Inc()
 		c.size += bytesize.ByteSize(len(value))
 		for c.size > c.capacity {
-			stats.Deletes.Inc()
+			metrics.Deletes.Inc()
 			tail := c.linklist.PopTail()
 			c.size -= bytesize.ByteSize(len(tail.Value))
 			delete(c.cache, tail.Key)

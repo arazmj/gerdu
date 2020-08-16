@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/grpcserver"
 	"github.com/arazmj/gerdu/httpserver"
@@ -10,6 +9,7 @@ import (
 	"github.com/arazmj/gerdu/lrucache"
 	"github.com/arazmj/gerdu/weakcache"
 	"github.com/inhies/go-bytesize"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -38,7 +38,11 @@ var (
 
 func main() {
 	flag.Parse()
-	capacity, _ := bytesize.Parse(*capacityStr)
+	capacity, err := bytesize.Parse(*capacityStr)
+
+	if err != nil {
+		log.Fatal("Invalid value for capacity", err.Error())
+	}
 
 	if strings.ToLower(*kind) == "lru" {
 		gerdu = lrucache.NewCache(capacity)
@@ -47,7 +51,7 @@ func main() {
 	} else if strings.ToLower(*kind) == "weak" {
 		gerdu = weakcache.NewWeakCache()
 	} else {
-		fmt.Println("Invalid value for type")
+		log.Fatalf("Invalid value for type")
 		os.Exit(1)
 	}
 
@@ -74,7 +78,7 @@ func main() {
 			}
 		}()
 	} else {
-		fmt.Println("Invalid value for protocol")
+		log.Fatalf("Invalid value for protocol")
 		os.Exit(1)
 	}
 	wg.Wait()

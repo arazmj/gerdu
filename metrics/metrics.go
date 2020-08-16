@@ -1,5 +1,5 @@
-// Package stats this package contains Prometheus counters
-package stats
+// Package metrics this package contains Prometheus counters
+package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"

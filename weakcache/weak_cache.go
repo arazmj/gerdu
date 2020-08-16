@@ -2,7 +2,7 @@
 package weakcache
 
 import (
-	"github.com/arazmj/gerdu/stats"
+	"github.com/arazmj/gerdu/metrics"
 	"github.com/ivanrad/go-weakref/weakref"
 	"sync"
 )
@@ -19,7 +19,7 @@ func NewWeakCache() *WeakCache {
 
 // Put a new key value pair
 func (c *WeakCache) Put(key string, value string) (created bool) {
-	stats.Adds.Inc()
+	metrics.Adds.Inc()
 	ref := weakref.NewWeakRef(value)
 	c.Store(key, ref)
 	return true
@@ -31,12 +31,12 @@ func (c *WeakCache) Get(key string) (value string, ok bool) {
 	if ok {
 		ref := v.(*weakref.WeakRef)
 		if ref.IsAlive() {
-			stats.Hits.Inc()
+			metrics.Hits.Inc()
 			return ref.GetTarget().(string), true
 		}
-		stats.Deletes.Inc()
+		metrics.Deletes.Inc()
 		c.Delete(key)
 	}
-	stats.Miss.Inc()
+	metrics.Miss.Inc()
 	return "", false
 }
