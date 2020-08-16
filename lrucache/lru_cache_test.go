@@ -61,3 +61,14 @@ func BenchmarkLRUCache(b *testing.B) {
 		cache.Get(key)
 	}
 }
+
+func TestLruCache_Delete(t *testing.T) {
+	cache := NewCache(10)
+	cache.Put("1", "1")
+	_, getOk1 := cache.Get("1")
+	cache.Delete("1")
+	_, getOk2 := cache.Get("1")
+	if !getOk1 || getOk2 {
+		t.Fatal("Expected the ket to be deleted")
+	}
+}

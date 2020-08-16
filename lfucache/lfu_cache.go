@@ -2,15 +2,14 @@
 package lfucache
 
 import (
-	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/dlinklist"
 	"github.com/arazmj/gerdu/metrics"
 	"github.com/inhies/go-bytesize"
 	"sync"
 )
 
-// LFUCache data structure
-type LFUCache struct {
+// lfuCache data structure
+type lfuCache struct {
 	sync.Mutex
 	size     bytesize.ByteSize
 	capacity bytesize.ByteSize
@@ -19,9 +18,9 @@ type LFUCache struct {
 	minFreq  int
 }
 
-// NewCache LFUCache constructor
-func NewCache(capacity bytesize.ByteSize) cache.UnImplementedCache {
-	return &LFUCache{
+// NewCache lfuCache constructor
+func NewCache(capacity bytesize.ByteSize) *lfuCache {
+	return &lfuCache{
 		size:     0,
 		capacity: capacity,
 		node:     map[string]*dlinklist.Node{},
@@ -49,11 +48,11 @@ func NewCache(capacity bytesize.ByteSize) cache.UnImplementedCache {
 // update minFreq to `f+1`
 //
 // All of the above operations took O(1) time.
-func (c *LFUCache) update(node *dlinklist.Node) {
+func (c *lfuCache) update(node *dlinklist.Node) {
 	freq := node.Freq
 
 	c.freq[freq].RemoveNode(node)
-	if v, _ := c.freq[freq]; c.minFreq == freq && v.Size == 0 {
+	if v, _ := c.freq[freq]; c.minFreq == freq && v.Size() == 0 {
 		delete(c.freq, freq)
 		c.minFreq++
 	}
@@ -68,7 +67,7 @@ func (c *LFUCache) update(node *dlinklist.Node) {
 
 // Get through checking node[key], we can get the node in O(1) time.
 // Just performs update, then we can return the value of node.
-func (c *LFUCache) Get(key string) (value string, ok bool) {
+func (c *lfuCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 
@@ -96,7 +95,7 @@ func (c *LFUCache) Get(key string) (value string, ok bool) {
 // recently used order (Always append at head)
 // 3. The tail of the DLinkedList with minFreq is the least
 //recently used one, pop it.
-func (c *LFUCache) Put(key, value string) (created bool) {
+func (c *lfuCache) Put(key, value string) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if c.capacity == 0 {
@@ -111,23 +110,21 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 	} else {
 		c.size += bytesize.ByteSize(len(value))
 		for c.size > c.capacity {
-			metrics.Deletes.Inc()
 			minList, ok := c.freq[c.minFreq]
-
-			if !ok || minList.Size == 0 {
+			metrics.Deletes.Inc()
+			if !ok || minList.Size() == 0 {
 				delete(c.freq, c.minFreq)
 				c.minFreq++
-				continue
+			} else {
+				node := minList.PopTail()
+				freq := node.Freq
+				if v, _ := c.freq[c.minFreq]; c.minFreq == freq && v.Size() == 0 {
+					delete(c.freq, freq)
+					c.minFreq++
+				}
+				c.size -= bytesize.ByteSize(len(node.Value))
+				delete(c.node, node.Key)
 			}
-
-			node := minList.PopTail()
-			freq := node.Freq
-			if v, _ := c.freq[c.minFreq]; c.minFreq == freq && v.Size == 0 {
-				delete(c.freq, freq)
-				c.minFreq++
-			}
-			c.size -= bytesize.ByteSize(len(node.Value))
-			delete(c.node, node.Key)
 		}
 		metrics.Adds.Inc()
 		node := &dlinklist.Node{
@@ -145,4 +142,19 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 		created = true
 	}
 	return created
+}
+
+func (c *lfuCache) Delete(key string) (ok bool) {
+	node, ok := c.node[key]
+	if !ok {
+		return false
+	}
+	freq := node.Freq
+	if v, _ := c.freq[c.minFreq]; c.minFreq == freq && v.Size() == 0 {
+		metrics.Deletes.Inc()
+		delete(c.freq, freq)
+		c.minFreq++
+	}
+	delete(c.node, key)
+	return true
 }

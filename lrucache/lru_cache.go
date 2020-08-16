@@ -2,15 +2,14 @@
 package lrucache
 
 import (
-	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/dlinklist"
 	"github.com/arazmj/gerdu/metrics"
 	"github.com/inhies/go-bytesize"
 	"sync"
 )
 
-//LRUCache data structure
-type LRUCache struct {
+//LruCache data structure
+type LruCache struct {
 	sync.RWMutex
 	cache    map[string]*dlinklist.Node
 	linklist *dlinklist.DLinkedList
@@ -18,9 +17,9 @@ type LRUCache struct {
 	size     bytesize.ByteSize
 }
 
-// NewCache LRUCache constructor
-func NewCache(capacity bytesize.ByteSize) cache.UnImplementedCache {
-	return &LRUCache{
+// NewCache LruCache constructor
+func NewCache(capacity bytesize.ByteSize) *LruCache {
+	return &LruCache{
 		cache:    map[string]*dlinklist.Node{},
 		linklist: dlinklist.NewLinkedList(),
 		capacity: capacity,
@@ -29,7 +28,7 @@ func NewCache(capacity bytesize.ByteSize) cache.UnImplementedCache {
 }
 
 // Get returns the value for the key
-func (c *LRUCache) Get(key string) (value string, ok bool) {
+func (c *LruCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 	if value, ok := c.cache[key]; ok {
@@ -45,7 +44,7 @@ func (c *LRUCache) Get(key string) (value string, ok bool) {
 
 // Put updates or insert a new entry, evicts the old entry
 // if cache size is larger than capacity
-func (c *LRUCache) Put(key string, value string) (created bool) {
+func (c *LruCache) Put(key string, value string) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if v, ok := c.cache[key]; ok {
@@ -72,9 +71,21 @@ func (c *LRUCache) Put(key string, value string) (created bool) {
 }
 
 // HasKey indicates the key exists or not
-func (c *LRUCache) HasKey(key string) bool {
+func (c *LruCache) HasKey(key string) bool {
 	defer c.RUnlock()
 	c.RLock()
 	_, ok := c.cache[key]
 	return ok
+}
+
+//Delete the key from the cache
+func (c *LruCache) Delete(key string) (ok bool) {
+	if node, ok := c.cache[key]; ok {
+		metrics.Deletes.Inc()
+		c.linklist.RemoveNode(node)
+		delete(c.cache, key)
+	} else {
+		return false
+	}
+	return true
 }

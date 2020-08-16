@@ -40,3 +40,10 @@ func (c *WeakCache) Get(key string) (value string, ok bool) {
 	metrics.Miss.Inc()
 	return "", false
 }
+
+//Delete deletes the key
+func (c *WeakCache) Delete(key string) bool {
+	metrics.Deletes.Inc()
+	c.Map.Delete(key)
+	return true
+}

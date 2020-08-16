@@ -14,7 +14,7 @@ type Node struct {
 type DLinkedList struct {
 	head *Node
 	tail *Node
-	Size int
+	size int
 }
 
 // NewLinkedList constructor
@@ -36,7 +36,7 @@ func (c *DLinkedList) AddNode(node *Node) {
 	next.prev = node
 	node.next = next
 	node.prev = c.head
-	c.Size++
+	c.size++
 }
 
 // RemoveNode removes a node
@@ -45,7 +45,7 @@ func (c *DLinkedList) RemoveNode(node *Node) {
 	next := node.next
 	prev.next = next
 	next.prev = prev
-	c.Size--
+	c.size--
 }
 
 // PopTail pops a node from the beginning of the linked list
@@ -53,4 +53,8 @@ func (c *DLinkedList) PopTail() *Node {
 	prev := c.tail.prev
 	c.RemoveNode(prev)
 	return prev
+}
+
+func (c *DLinkedList) Size() int {
+	return c.size
 }
