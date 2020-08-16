@@ -1,24 +1,21 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"flag"
 	"fmt"
 	"github.com/arazmj/gerdu/cache"
+	"github.com/arazmj/gerdu/httpserver"
 	"github.com/arazmj/gerdu/lfucache"
 	"github.com/arazmj/gerdu/lrucache"
 	"github.com/arazmj/gerdu/proto"
 	"github.com/arazmj/gerdu/weakcache"
-	"github.com/gorilla/mux"
 	"github.com/inhies/go-bytesize"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -43,6 +40,7 @@ var (
 	protocols = flag.String("protocols", "http", "protocol grpc or http, multiple values can be selected seperated by comma")
 	tlsKey    = flag.String("key", "", "SSL certificate private key")
 	tlsCert   = flag.String("cert", "", "SSL certificate public key")
+	secure    = len(*tlsCert) > 0 && len(*tlsKey) > 0
 )
 
 func main() {
@@ -64,7 +62,12 @@ func main() {
 	if strings.Contains(*protocols, "http") {
 		wg.Add(1)
 		go func() {
-			httpServer()
+			defer wg.Done()
+			if secure {
+				httpserver.HttpServeTLS(*httpPort, *tlsCert, *tlsKey, gerdu, *verbose)
+			} else {
+				httpserver.HttpServe(*httpPort, gerdu, *verbose)
+			}
 		}()
 	}
 	if strings.Contains(*protocols, "grpc") {
@@ -138,63 +141,4 @@ func (s *server) Get(ctx context.Context, request *proto.GetRequest) (*proto.Get
 		log.Printf("gRPC MISSED Key: %s \n", value)
 	}
 	return nil, errors.New("key not found")
-}
-
-func httpServer() {
-	defer wg.Done()
-	host := ":" + strconv.Itoa(*httpPort)
-	router := mux.NewRouter()
-	router.HandleFunc("/cache/{key}", getHandler).Methods(http.MethodGet)
-	router.HandleFunc("/cache/{key}", putHandler).Methods(http.MethodPut)
-	router.Handle("/metrics", promhttp.Handler())
-	if len(*tlsCert) > 0 && len(*tlsKey) > 0 {
-		log.Printf("Gerdu started listening HTTPS TLS on %d port\n", *httpPort)
-		log.Fatal(http.ListenAndServeTLS(host, *tlsCert, *tlsKey, router))
-	} else {
-		log.Printf("Gerdu started listening HTTP on %d port\n", *httpPort)
-		log.Fatal(http.ListenAndServe(host, router))
-	}
-}
-
-func putHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	key := vars["key"]
-	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(r.Body)
-	if err != nil {
-		log.Fatal(err.Error())
-		return
-	}
-	value := buf.String()
-
-	created := gerdu.Put(key, value)
-	if *verbose {
-		if !created {
-			log.Printf("HTTP UPDATE Key: %s Value: %s\n", key, value)
-		} else {
-			log.Printf("HTTP INSERT Key: %s Value: %s\n", key, value)
-		}
-	}
-	if created {
-		w.WriteHeader(http.StatusCreated)
-	} else {
-		w.WriteHeader(http.StatusNoContent)
-	}
-}
-
-func getHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	key := vars["key"]
-	if value, ok := gerdu.Get(key); ok {
-		if *verbose {
-			log.Printf("HTTP RETREIVED Key: %s Value: %s\n", key, value)
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(value))
-	} else {
-		if *verbose {
-			log.Printf("HTTP MISSED Key: %s \n", value)
-		}
-		w.WriteHeader(http.StatusNotFound)
-	}
 }
