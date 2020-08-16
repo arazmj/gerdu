@@ -34,9 +34,10 @@ var (
 			"\nM or MB: Megabytes"+
 			"\nG or GB: Gigabytes"+
 			"\nT or TB: Terabytes")
-	port     = flag.Int("port", 8080, "the server port number")
-	kind     = flag.String("type", "lru", "type of cache, lru or lfu, weak")
-	protocol = flag.String("protocol", "http", "protocol grpc or http")
+	httpPort  = flag.Int("httpPort", 8080, "the http server port number")
+	grpcPort  = flag.Int("grpcport", 8081, "the grpc server port number")
+	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
+	protocols = flag.String("protocol", "http", "protocol grpc or http, multiple values can be selected seperated by comma")
 )
 
 func main() {
@@ -54,9 +55,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if strings.ToLower(*protocol) == "http" {
+	*protocols = strings.ToLower(*protocols)
+	if strings.Contains(*protocols, "http") {
 		httpServer()
-	} else if strings.ToLower(*protocol) == "grpc" {
+	}
+	if strings.Contains(*protocols, "grps") {
 		grpcServer()
 	} else {
 		fmt.Println("Invalid value for protocol")
@@ -65,8 +68,8 @@ func main() {
 }
 
 func grpcServer() {
-	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*port))
-	log.Printf("Gerdu started listening gRPC on %d port\n", *port)
+	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*grpcPort))
+	log.Printf("Gerdu started listening gRPC on %d port\n", *grpcPort)
 
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -119,8 +122,8 @@ func httpServer() {
 	router.HandleFunc("/cache/{key}", getHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cache/{key}", putHandler).Methods(http.MethodPut)
 	router.Handle("/metrics", promhttp.Handler())
-	log.Printf("Gerdu started listening HTTP on %d port\n", *port)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), router))
+	log.Printf("Gerdu started listening HTTP on %d port\n", *httpPort)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*httpPort), router))
 }
 
 func putHandler(w http.ResponseWriter, r *http.Request) {

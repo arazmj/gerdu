@@ -7,6 +7,9 @@
 Gerdu is a thread-safe key-value in-memory database server written in GoLang.
 Currently, it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used). 
 It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
+<br/>
+
+You can enable gRPC and HTTP and enjoy taking advantage of both protocols simultaneously. 
 ```
   -capacity string
         The size of cache, once cache reached this capacity old values will evicted.
