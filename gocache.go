@@ -15,6 +15,7 @@ import (
 	"github.com/inhies/go-bytesize"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"net"
 	"net/http"
@@ -40,6 +41,8 @@ var (
 	grpcPort  = flag.Int("grpcport", 8081, "the grpc server port number")
 	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
 	protocols = flag.String("protocols", "http", "protocol grpc or http, multiple values can be selected seperated by comma")
+	tlsKey    = flag.String("key", "", "SSL certificate private key")
+	tlsCert   = flag.String("cert", "", "SSL certificate public key")
 )
 
 func main() {
@@ -78,13 +81,23 @@ func main() {
 
 func grpcServer() {
 	defer wg.Done()
-	lis, err := net.Listen("tcp", ":"+strconv.Itoa(*grpcPort))
+	host := ":" + strconv.Itoa(*grpcPort)
+	lis, err := net.Listen("tcp", host)
 	log.Printf("Gerdu started listening gRPC on %d port\n", *grpcPort)
-
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+	var s *grpc.Server
+	if len(*tlsCert) > 0 && len(*tlsKey) > 0 {
+		credentials, err := credentials.NewServerTLSFromFile(*tlsCert, *tlsKey)
+		if err != nil {
+			log.Fatalf("Failed to setup TLS for gRPC service: %v", err)
+		}
+
+		s = grpc.NewServer(grpc.Creds(credentials))
+	} else {
+		s = grpc.NewServer()
+	}
 	proto.RegisterGerduServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
@@ -129,12 +142,18 @@ func (s *server) Get(ctx context.Context, request *proto.GetRequest) (*proto.Get
 
 func httpServer() {
 	defer wg.Done()
+	host := ":" + strconv.Itoa(*httpPort)
 	router := mux.NewRouter()
 	router.HandleFunc("/cache/{key}", getHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cache/{key}", putHandler).Methods(http.MethodPut)
 	router.Handle("/metrics", promhttp.Handler())
-	log.Printf("Gerdu started listening HTTP on %d port\n", *httpPort)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*httpPort), router))
+	if len(*tlsCert) > 0 && len(*tlsKey) > 0 {
+		log.Printf("Gerdu started listening HTTPS TLS on %d port\n", *httpPort)
+		log.Fatal(http.ListenAndServeTLS(host, *tlsCert, *tlsKey, router))
+	} else {
+		log.Printf("Gerdu started listening HTTP on %d port\n", *httpPort)
+		log.Fatal(http.ListenAndServe(host, router))
+	}
 }
 
 func putHandler(w http.ResponseWriter, r *http.Request) {

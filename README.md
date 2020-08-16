@@ -19,10 +19,14 @@ Usage of gerdu:
         M or MB: Megabytes
         G or GB: Gigabytes
         T or TB: Terabytes (default "64MB")
+  -cert string
+        SSL certificate public key
   -grpcport int
         the grpc server port number (default 8081)
   -httpPort int
         the http server port number (default 8080)
+  -key string
+        SSL certificate private key
   -protocols string
         protocol grpc or http, multiple values can be selected seperated by comma (default "http")
   -type string
