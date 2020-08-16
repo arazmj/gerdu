@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "proto;proto";
+
+package gerdu;
+
+service Gerdu {
+    rpc Put(PutRequest) returns (PutResponse);
+    rpc Get(GetRequest) returns (GetResponse);
+}
+
+message PutResponse {
+    bool created = 1;
+}
+message PutRequest {
+    string key = 1;
+    bytes value = 2;
+}
+
+message GetRequest {
+    string key = 1;
+}
+
+message GetResponse {
+    bytes value = 1;
+}
