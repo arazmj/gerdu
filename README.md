@@ -11,6 +11,7 @@ It also supports for weak reference type of cache where the cache consumes as mu
 
 You can enable gRPC and HTTP and enjoy taking advantage of both protocols simultaneously. 
 ```
+Usage of gerdu:
   -capacity string
         The size of cache, once cache reached this capacity old values will evicted.
         Specify a numerical value followed by one of the following units (not case sensitive)
@@ -18,10 +19,12 @@ You can enable gRPC and HTTP and enjoy taking advantage of both protocols simult
         M or MB: Megabytes
         G or GB: Gigabytes
         T or TB: Terabytes (default "64MB")
-  -port int
-        the server port number (default 8080)
-  -protocol string
-        protocol grpc or http (default "http")
+  -grpcport int
+        the grpc server port number (default 8081)
+  -httpPort int
+        the http server port number (default 8080)
+  -protocols string
+        protocol grpc or http, multiple values can be selected seperated by comma (default "http")
   -type string
         type of cache, lru or lfu, weak (default "lru")
   -verbose
