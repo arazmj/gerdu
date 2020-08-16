@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion6
 type GerduClient interface {
 	Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
 
 type gerduClient struct {
@@ -47,12 +48,22 @@ func (c *gerduClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.Call
 	return out, nil
 }
 
+func (c *gerduClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, "/gerdu.Gerdu/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GerduServer is the server API for Gerdu service.
 // All implementations must embed UnimplementedGerduServer
 // for forward compatibility
 type GerduServer interface {
 	Put(context.Context, *PutRequest) (*PutResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	mustEmbedUnimplementedGerduServer()
 }
 
@@ -65,6 +76,9 @@ func (*UnimplementedGerduServer) Put(context.Context, *PutRequest) (*PutResponse
 }
 func (*UnimplementedGerduServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedGerduServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (*UnimplementedGerduServer) mustEmbedUnimplementedGerduServer() {}
 
@@ -108,6 +122,24 @@ func _Gerdu_Get_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerdu_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerduServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerdu.Gerdu/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerduServer).Delete(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Gerdu_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "gerdu.Gerdu",
 	HandlerType: (*GerduServer)(nil),
@@ -119,6 +151,10 @@ var _Gerdu_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _Gerdu_Get_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _Gerdu_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

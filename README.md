@@ -43,7 +43,7 @@ Usage of gerdu:
 
 ## Example
 Example of usage:
-To insert or update a key 
+To insert or update or delete a key 
 ```Bash
 curl --request PUT --data '1' http://localhost:8080/cache/1
 curl --request PUT --data '2' http://localhost:8080/cache/2

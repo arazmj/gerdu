@@ -65,4 +65,13 @@ func TestServerGrpc(t *testing.T) {
 	if value != "Value1" {
 		t.Fatalf("gRPC Get the value does not match expecting Value1, but got %v", value)
 	}
+
+	client.Delete(ctx, &proto.DeleteRequest{Key: "Key1"})
+	_, err = client.Get(ctx, &proto.GetRequest{
+		Key: "Key1",
+	})
+
+	if err == nil {
+		t.Fatalf("gRPC Deleted key should not get: %v", err)
+	}
 }

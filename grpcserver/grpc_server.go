@@ -76,7 +76,23 @@ func (s *server) Get(ctx context.Context, request *proto.GetRequest) (*proto.Get
 		}, nil
 	}
 	if s.verbose {
-		log.Printf("gRPC MISSED Key: %s \n", value)
+		log.Printf("gRPC MISSED Key: %s \n", request.Key)
+	}
+	return nil, errors.New("key not found")
+}
+
+func (s *server) Delete(ctx context.Context, request *proto.DeleteRequest) (*proto.DeleteResponse, error) {
+	ok := s.gerdu.Delete(request.Key)
+	if ok {
+		if s.verbose {
+			log.Printf("gRPC DELETE Key: %s\n", request.Key)
+		}
+		return &proto.DeleteResponse{
+			Deleted: true,
+		}, nil
+	}
+	if s.verbose {
+		log.Printf("gRPC MISSED Key: %s \n", request.Key)
 	}
 	return nil, errors.New("key not found")
 }
