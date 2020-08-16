@@ -10,7 +10,7 @@ import (
 )
 
 func TestIndexHandler(t *testing.T) {
-	cache2 = lrucache.NewCache(2)
+	gerdu = lrucache.NewCache(2)
 	tests := []struct {
 		name             string
 		r                *http.Request
