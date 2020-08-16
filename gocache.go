@@ -107,12 +107,11 @@ func (s *server) Get(ctx context.Context, request *proto.GetRequest) (*proto.Get
 		return &proto.GetResponse{
 			Value: []byte(value),
 		}, nil
-	} else {
-		if *verbose {
-			log.Printf("MISSED Key: %s \n", value)
-		}
-		return nil, errors.New("key not found")
 	}
+	if *verbose {
+		log.Printf("MISSED Key: %s \n", value)
+	}
+	return nil, errors.New("key not found")
 }
 
 func httpServer() {
