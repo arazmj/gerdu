@@ -1,4 +1,4 @@
-// This package implements LRU (Least Recently Used) cache
+// Package lrucache implements LRU (Least Recently Used) cache
 package lrucache
 
 import (

@@ -1,4 +1,4 @@
-// This package implements Weak Cache, eviction of entries are controlled by GC
+// Package weakcache implements Weak Cache, eviction of entries are controlled by GC
 package weakcache
 
 import (

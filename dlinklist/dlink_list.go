@@ -1,4 +1,4 @@
-// This package implement doubly linked list as backing data structure for cache operations
+// Package dlinklist implements a doubly linked list as backing data structure for cache operations
 package dlinklist
 
 // Node data structure
