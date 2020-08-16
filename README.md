@@ -9,7 +9,8 @@
 
 # Gerdu
 
-Gerdu is a key-value in-memory database server written in GoLang.
+## About
+Gerdu is a key-value in-memory database server written in Go programming language (http://golang.org/).
 Currently, it supports two eviction policy LFU (Least Frequently Used) and LRU (Least Recently Used). 
 It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
 <br/>
@@ -28,7 +29,7 @@ Usage of gerdu:
         SSL certificate public key
   -grpcport int
         the grpc server port number (default 8081)
-  -httpPort int
+  -httpport int
         the http server port number (default 8080)
   -key string
         SSL certificate private key
@@ -40,6 +41,7 @@ Usage of gerdu:
         verbose logging
 ```
 
+## Example
 Example of usage:
 To insert or update a key 
 ```
@@ -54,11 +56,15 @@ To retrieve the key
 curl --request GET localhost:8080/cache/3
 ```
 
+## Telemetry 
 Prometheus metrics
 ```
 curl --request GET localhost:8080/metrics
 ```
 
+## Sample applications
 Sample application s available in:
 
+
 C++, Dart, Erlang, Groovy, Java, NodeJS, PHP, Python, Ruby, Scala ,C# ,Elixir ,GoLang ,Haskell ,Kotlin ,Objective-C ,Perl ,R ,Rust ,Swift
+

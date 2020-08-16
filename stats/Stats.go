@@ -1,4 +1,4 @@
-// This package contains Prometheus counters
+// Package stats this package contains Prometheus counters
 package stats
 
 import (

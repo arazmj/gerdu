@@ -37,7 +37,7 @@ var (
 			"\nM or MB: Megabytes"+
 			"\nG or GB: Gigabytes"+
 			"\nT or TB: Terabytes")
-	httpPort  = flag.Int("httpPort", 8080, "the http server port number")
+	httpPort  = flag.Int("httpport", 8080, "the http server port number")
 	grpcPort  = flag.Int("grpcport", 8081, "the grpc server port number")
 	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
 	protocols = flag.String("protocols", "http", "protocol grpc or http, multiple values can be selected seperated by comma")
