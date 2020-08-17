@@ -44,43 +44,12 @@ var (
 
 func main() {
 	flag.Parse()
-	switch *loglevel {
-	case "panic":
-		log.SetLevel(log.PanicLevel)
-	case "fatal":
-		log.SetLevel(log.FatalLevel)
-	case "error":
-		log.SetLevel(log.ErrorLevel)
-	case "warn":
-		log.SetLevel(log.WarnLevel)
-	case "info":
-		log.SetLevel(log.InfoLevel)
-	case "debug":
-		log.SetLevel(log.DebugLevel)
-	case "trace":
-		log.SetLevel(log.DebugLevel)
-	default:
-		log.Fatalf("Invalid log level value %s\n", *loglevel)
-		os.Exit(1)
-	}
+	setLogLevel()
+	setCache()
+	serve()
+}
 
-	capacity, err := bytesize.Parse(*capacityStr)
-
-	if err != nil {
-		log.Fatal("Invalid value for capacity", err.Error())
-	}
-
-	if strings.ToLower(*kind) == "lru" {
-		gerdu = lrucache.NewCache(capacity)
-	} else if strings.ToLower(*kind) == "lfu" {
-		gerdu = lfucache.NewCache(capacity)
-	} else if strings.ToLower(*kind) == "weak" {
-		gerdu = weakcache.NewWeakCache()
-	} else {
-		log.Fatalf("Invalid value for type")
-		os.Exit(1)
-	}
-
+func serve() {
 	*protocols = strings.ToLower(*protocols)
 	var validProtocol bool
 	if strings.Contains(*protocols, "http") {
@@ -127,4 +96,44 @@ func main() {
 		os.Exit(1)
 	}
 	wg.Wait()
+}
+
+func setCache() {
+	capacity, err := bytesize.Parse(*capacityStr)
+	if err != nil {
+		log.Fatal("Invalid value for capacity", err.Error())
+	}
+
+	if strings.ToLower(*kind) == "lru" {
+		gerdu = lrucache.NewCache(capacity)
+	} else if strings.ToLower(*kind) == "lfu" {
+		gerdu = lfucache.NewCache(capacity)
+	} else if strings.ToLower(*kind) == "weak" {
+		gerdu = weakcache.NewWeakCache()
+	} else {
+		log.Fatalf("Invalid value for type")
+		os.Exit(1)
+	}
+}
+
+func setLogLevel() {
+	switch *loglevel {
+	case "panic":
+		log.SetLevel(log.PanicLevel)
+	case "fatal":
+		log.SetLevel(log.FatalLevel)
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	case "warn":
+		log.SetLevel(log.WarnLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	case "debug":
+		log.SetLevel(log.DebugLevel)
+	case "trace":
+		log.SetLevel(log.DebugLevel)
+	default:
+		log.Fatalf("Invalid log level value %s\n", *loglevel)
+		os.Exit(1)
+	}
 }
