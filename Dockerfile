@@ -1,6 +1,6 @@
-FROM golang:1.10
+FROM golang:1.15
 
-WORKDIR $GOPATH/src/github.com/arazmj/GoCache
+WORKDIR $GOPATH/src/github.com/arazmj/gerdu
 
 COPY . .
 
@@ -10,4 +10,4 @@ RUN go install -v ./...
 
 EXPOSE 8080
 
-CMD ["GoCache"]
+CMD ["gerdu"]
