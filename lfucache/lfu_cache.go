@@ -1,4 +1,4 @@
-// This package implement LFU (Least Frequently Used) cache
+// Package lfucache implements LFU (Least Frequently Used) cache
 package lfucache
 
 import (
@@ -8,8 +8,8 @@ import (
 	"sync"
 )
 
-// lfuCache data structure
-type lfuCache struct {
+// LFUCache data structure
+type LFUCache struct {
 	sync.Mutex
 	size     bytesize.ByteSize
 	capacity bytesize.ByteSize
@@ -18,9 +18,9 @@ type lfuCache struct {
 	minFreq  int
 }
 
-// NewCache lfuCache constructor
-func NewCache(capacity bytesize.ByteSize) *lfuCache {
-	return &lfuCache{
+// NewCache LFUCache constructor
+func NewCache(capacity bytesize.ByteSize) *LFUCache {
+	return &LFUCache{
 		size:     0,
 		capacity: capacity,
 		node:     map[string]*dlinklist.Node{},
@@ -48,7 +48,7 @@ func NewCache(capacity bytesize.ByteSize) *lfuCache {
 // update minFreq to `f+1`
 //
 // All of the above operations took O(1) time.
-func (c *lfuCache) update(node *dlinklist.Node) {
+func (c *LFUCache) update(node *dlinklist.Node) {
 	freq := node.Freq
 
 	c.freq[freq].RemoveNode(node)
@@ -67,7 +67,7 @@ func (c *lfuCache) update(node *dlinklist.Node) {
 
 // Get through checking node[key], we can get the node in O(1) time.
 // Just performs update, then we can return the value of node.
-func (c *lfuCache) Get(key string) (value string, ok bool) {
+func (c *LFUCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 
@@ -95,7 +95,7 @@ func (c *lfuCache) Get(key string) (value string, ok bool) {
 // recently used order (Always append at head)
 // 3. The tail of the DLinkedList with minFreq is the least
 //recently used one, pop it.
-func (c *lfuCache) Put(key, value string) (created bool) {
+func (c *LFUCache) Put(key, value string) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if c.capacity == 0 {
@@ -144,7 +144,7 @@ func (c *lfuCache) Put(key, value string) (created bool) {
 	return created
 }
 
-func (c *lfuCache) Delete(key string) (ok bool) {
+func (c *LFUCache) Delete(key string) (ok bool) {
 	node, ok := c.node[key]
 	if !ok {
 		return false

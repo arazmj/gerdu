@@ -21,7 +21,7 @@ var gerdu cache.UnImplementedCache
 var wg = sync.WaitGroup{}
 
 var (
-	loglevel = flag.String("log", "error",
+	loglevel = flag.String("log", "info",
 		"log level can be any of values of 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'")
 	capacityStr = flag.String("capacity", "64MB",
 		"The size of cache, once cache reached this capacity old values will evicted.\n"+
@@ -90,9 +90,9 @@ func main() {
 			defer wg.Done()
 			httpHost := *host + ":" + strconv.Itoa(*httpPort)
 			if secure {
-				httpserver.HttpServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
+				httpserver.HTTPServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
 			} else {
-				httpserver.HttpServe(httpHost, gerdu)
+				httpserver.HTTPServe(httpHost, gerdu)
 			}
 		}()
 	}
@@ -119,7 +119,7 @@ func main() {
 				log.Fatalln("Memcached protocol does not support TLS")
 				os.Exit(1)
 			}
-			memcached.MemcachedServe(mcdHost, gerdu)
+			memcached.Serve(mcdHost, gerdu)
 		}()
 	}
 	if !validProtocol {

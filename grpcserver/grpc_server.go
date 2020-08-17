@@ -30,11 +30,13 @@ func grpcServe(s *grpc.Server, host string, gerdu cache.UnImplementedCache) {
 	}
 }
 
+//GrpcServe start gRPC server in non-secure mode
 func GrpcServe(host string, gerdu cache.UnImplementedCache) {
 	s := grpc.NewServer()
 	grpcServe(s, host, gerdu)
 }
 
+//GrpcServeTLS start gRPC server secure
 func GrpcServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCache) {
 	credentials, err := credentials.NewServerTLSFromFile(tlsCert, tlsKey)
 	if err != nil {

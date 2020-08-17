@@ -8,7 +8,8 @@ import (
 	"strconv"
 )
 
-func MemcachedServe(host string, gerdu cache.UnImplementedCache) {
+//Serve start memcached server
+func Serve(host string, gerdu cache.UnImplementedCache) {
 	mockServer := mc.NewServer(host)
 	mockServer.RegisterFunc("get", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return getHandler(ctx, req, res, gerdu)

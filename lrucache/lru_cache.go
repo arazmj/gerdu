@@ -8,8 +8,8 @@ import (
 	"sync"
 )
 
-//LruCache data structure
-type LruCache struct {
+//LRUCache data structure
+type LRUCache struct {
 	sync.RWMutex
 	cache    map[string]*dlinklist.Node
 	linklist *dlinklist.DLinkedList
@@ -17,9 +17,9 @@ type LruCache struct {
 	size     bytesize.ByteSize
 }
 
-// NewCache LruCache constructor
-func NewCache(capacity bytesize.ByteSize) *LruCache {
-	return &LruCache{
+// NewCache LRUCache constructor
+func NewCache(capacity bytesize.ByteSize) *LRUCache {
+	return &LRUCache{
 		cache:    map[string]*dlinklist.Node{},
 		linklist: dlinklist.NewLinkedList(),
 		capacity: capacity,
@@ -28,7 +28,7 @@ func NewCache(capacity bytesize.ByteSize) *LruCache {
 }
 
 // Get returns the value for the key
-func (c *LruCache) Get(key string) (value string, ok bool) {
+func (c *LRUCache) Get(key string) (value string, ok bool) {
 	defer c.Unlock()
 	c.Lock()
 	if value, ok := c.cache[key]; ok {
@@ -44,7 +44,7 @@ func (c *LruCache) Get(key string) (value string, ok bool) {
 
 // Put updates or insert a new entry, evicts the old entry
 // if cache size is larger than capacity
-func (c *LruCache) Put(key string, value string) (created bool) {
+func (c *LRUCache) Put(key string, value string) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if v, ok := c.cache[key]; ok {
@@ -71,7 +71,7 @@ func (c *LruCache) Put(key string, value string) (created bool) {
 }
 
 // HasKey indicates the key exists or not
-func (c *LruCache) HasKey(key string) bool {
+func (c *LRUCache) HasKey(key string) bool {
 	defer c.RUnlock()
 	c.RLock()
 	_, ok := c.cache[key]
@@ -79,7 +79,7 @@ func (c *LruCache) HasKey(key string) bool {
 }
 
 //Delete the key from the cache
-func (c *LruCache) Delete(key string) (ok bool) {
+func (c *LRUCache) Delete(key string) (ok bool) {
 	if node, ok := c.cache[key]; ok {
 		metrics.Deletes.Inc()
 		c.linklist.RemoveNode(node)

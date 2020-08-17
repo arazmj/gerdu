@@ -55,6 +55,7 @@ func (c *DLinkedList) PopTail() *Node {
 	return prev
 }
 
+//Size returns the size of link list
 func (c *DLinkedList) Size() int {
 	return c.size
 }
