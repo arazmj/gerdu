@@ -1,5 +1,5 @@
 ![Build](https://github.com/arazmj/gerdu/workflows/Go/badge.svg)
-![Release](https://github.com/arazmj/gerdu/workflows/Handle%20Release/badge.svg)
+![Release](https://github.com/arazmj/gerdu/workflows/GoReleaser/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/arazmj/gerdu)](https://goreportcard.com/report/github.com/arazmj/gerdu)
 [![codecov](https://codecov.io/gh/arazmj/gerdu/branch/master/graph/badge.svg)](https://codecov.io/gh/arazmj/gerdu)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/codeclimate/codeclimate/maintainability)
