@@ -144,6 +144,7 @@ func (c *LFUCache) Put(key, value string) (created bool) {
 	return created
 }
 
+//Delete deletes a key from LFU cache
 func (c *LFUCache) Delete(key string) (ok bool) {
 	node, ok := c.node[key]
 	if !ok {
