@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/arazmj/gerdu/lrucache"
 	"github.com/arazmj/gerdu/proto"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
-	"log"
 	"net"
 	"testing"
 )
@@ -19,8 +19,7 @@ func init() {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
 	proto.RegisterGerduServer(s, &server{
-		gerdu:   lrucache.NewCache(1000),
-		verbose: false,
+		gerdu: lrucache.NewCache(1000),
 	})
 	go func() {
 		if err := s.Serve(lis); err != nil {

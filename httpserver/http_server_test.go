@@ -84,11 +84,11 @@ func TestIndexHandler(t *testing.T) {
 			router.HandleFunc("/cache/{key}", func(w http.ResponseWriter, r *http.Request) {
 				switch test.r.Method {
 				case http.MethodPut:
-					putHandler(w, r, gerdu, false)
+					putHandler(w, r, gerdu)
 				case http.MethodGet:
-					getHandler(w, r, gerdu, false)
+					getHandler(w, r, gerdu)
 				case http.MethodDelete:
-					deleteHandler(w, r, gerdu, false)
+					deleteHandler(w, r, gerdu)
 				}
 			})
 			router.ServeHTTP(test.w, test.r)

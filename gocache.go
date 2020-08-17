@@ -7,10 +7,12 @@ import (
 	"github.com/arazmj/gerdu/httpserver"
 	"github.com/arazmj/gerdu/lfucache"
 	"github.com/arazmj/gerdu/lrucache"
+	"github.com/arazmj/gerdu/memcached"
 	"github.com/arazmj/gerdu/weakcache"
 	"github.com/inhies/go-bytesize"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -19,7 +21,8 @@ var gerdu cache.UnImplementedCache
 var wg = sync.WaitGroup{}
 
 var (
-	verbose     = flag.Bool("verbose", false, "verbose logging")
+	loglevel = flag.String("log", "error",
+		"log level can be any of values of 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'")
 	capacityStr = flag.String("capacity", "64MB",
 		"The size of cache, once cache reached this capacity old values will evicted.\n"+
 			"Specify a numerical value followed by one of the following units (not case sensitive)"+
@@ -29,15 +32,38 @@ var (
 			"\nT or TB: Terabytes")
 	httpPort  = flag.Int("httpport", 8080, "the http server port number")
 	grpcPort  = flag.Int("grpcport", 8081, "the grpc server port number")
+	mcdPort   = flag.Int("mcdport", 11211, "the memcached server port number")
 	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
-	protocols = flag.String("protocols", "http", "protocol grpc or http, multiple values can be selected seperated by comma")
-	tlsKey    = flag.String("key", "", "SSL certificate private key")
-	tlsCert   = flag.String("cert", "", "SSL certificate public key")
-	secure    = len(*tlsCert) > 0 && len(*tlsKey) > 0
+	protocols = flag.String("protocols", "http",
+		"protocol 'grpc', 'http' or 'mcd' (memcached), multiple values can be selected separated by comma")
+	tlsKey  = flag.String("key", "", "SSL certificate private key")
+	tlsCert = flag.String("cert", "", "SSL certificate public key")
+	host    = flag.String("host", "127.0.0.1", "The host that server listens")
+	secure  = len(*tlsCert) > 0 && len(*tlsKey) > 0
 )
 
 func main() {
 	flag.Parse()
+	switch *loglevel {
+	case "panic":
+		log.SetLevel(log.PanicLevel)
+	case "fatal":
+		log.SetLevel(log.FatalLevel)
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	case "warn":
+		log.SetLevel(log.WarnLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	case "debug":
+		log.SetLevel(log.DebugLevel)
+	case "trace":
+		log.SetLevel(log.DebugLevel)
+	default:
+		log.Fatalf("Invalid log level value %s\n", *loglevel)
+		os.Exit(1)
+	}
+
 	capacity, err := bytesize.Parse(*capacityStr)
 
 	if err != nil {
@@ -56,28 +82,47 @@ func main() {
 	}
 
 	*protocols = strings.ToLower(*protocols)
+	var validProtocol bool
 	if strings.Contains(*protocols, "http") {
+		validProtocol = true
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			httpHost := *host + ":" + strconv.Itoa(*httpPort)
 			if secure {
-				httpserver.HttpServeTLS(*httpPort, *tlsCert, *tlsKey, gerdu, *verbose)
+				httpserver.HttpServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
 			} else {
-				httpserver.HttpServe(*httpPort, gerdu, *verbose)
+				httpserver.HttpServe(httpHost, gerdu)
 			}
 		}()
 	}
 	if strings.Contains(*protocols, "grpc") {
+		validProtocol = true
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			grpcHost := *host + ":" + strconv.Itoa(*grpcPort)
 			if secure {
-				grpcserver.GrpcServeTLS(*grpcPort, *tlsCert, *tlsKey, gerdu, *verbose)
+				grpcserver.GrpcServeTLS(grpcHost, *tlsCert, *tlsKey, gerdu)
 			} else {
-				grpcserver.GrpcServe(*grpcPort, gerdu, *verbose)
+				grpcserver.GrpcServe(grpcHost, gerdu)
 			}
 		}()
-	} else {
+	}
+	if strings.Contains(*protocols, "mcd") {
+		validProtocol = true
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			mcdHost := *host + ":" + strconv.Itoa(*mcdPort)
+			if secure {
+				log.Fatalln("Memcached protocol does not support TLS")
+				os.Exit(1)
+			}
+			memcached.MemcachedServe(mcdHost, gerdu)
+		}()
+	}
+	if !validProtocol {
 		log.Fatalf("Invalid value for protocol")
 		os.Exit(1)
 	}
