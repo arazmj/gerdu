@@ -14,6 +14,12 @@ builds:
       - freebsd
       - netbsd
       - windows
+      - solaris
+      - aix
+      - dragonfly
+      - illumos
+      - js
+      - plan9
     goarch:
       - 386
       - amd64
@@ -27,12 +33,9 @@ builds:
       - 7
 
 archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+  - format_overrides:
+    - goos: windows
+      format: zip
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -43,3 +46,19 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+nfpms:
+  -
+    vendor: Amir Razmjou
+    homepage: https://github.com/arazmj/gerdu
+    maintainer: Amir Razmjou <arazmj@gmail.com>
+    description: Key-Value Memory Cache
+    license: BSD 3-Clause
+    formats:
+      - deb
+      - rpm
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      freebsd: FreeBSD
+      amd64: x86_64
