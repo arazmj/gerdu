@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 option go_package = "proto;proto";
+option java_package = "proto;proto";
 
 package gerdu;
 

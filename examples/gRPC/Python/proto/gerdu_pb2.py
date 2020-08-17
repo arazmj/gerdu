@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\013proto;proto',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0bgerdu.proto\x12\x05gerdu\"\x1e\n\x0bPutResponse\x12\x0f\n\x07\x63reated\x18\x01 \x01(\x08\"(\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x1c\n\x0bGetResponse\x12\r\n\x05value\x18\x01 \x01(\x0c\x32\x63\n\x05Gerdu\x12,\n\x03Put\x12\x11.gerdu.PutRequest\x1a\x12.gerdu.PutResponse\x12,\n\x03Get\x12\x11.gerdu.GetRequest\x1a\x12.gerdu.GetResponseB\rZ\x0bproto;protob\x06proto3'
+  serialized_pb=b'\n\x0bgerdu.proto\x12\x05gerdu\"\x1e\n\x0bPutResponse\x12\x0f\n\x07\x63reated\x18\x01 \x01(\x08\"(\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x1c\n\x0bGetResponse\x12\r\n\x05value\x18\x01 \x01(\x0c\"\x1c\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"!\n\x0e\x44\x65leteResponse\x12\x0f\n\x07\x64\x65leted\x18\x01 \x01(\x08\x32\x9a\x01\n\x05Gerdu\x12,\n\x03Put\x12\x11.gerdu.PutRequest\x1a\x12.gerdu.PutResponse\x12,\n\x03Get\x12\x11.gerdu.GetRequest\x1a\x12.gerdu.GetResponse\x12\x35\n\x06\x44\x65lete\x12\x14.gerdu.DeleteRequest\x1a\x15.gerdu.DeleteResponseB\rZ\x0bproto;protob\x06proto3'
 )
 
 
@@ -159,10 +159,76 @@ _GETRESPONSE = _descriptor.Descriptor(
   serialized_end=151,
 )
 
+
+_DELETEREQUEST = _descriptor.Descriptor(
+  name='DeleteRequest',
+  full_name='gerdu.DeleteRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='gerdu.DeleteRequest.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=153,
+  serialized_end=181,
+)
+
+
+_DELETERESPONSE = _descriptor.Descriptor(
+  name='DeleteResponse',
+  full_name='gerdu.DeleteResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='deleted', full_name='gerdu.DeleteResponse.deleted', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=183,
+  serialized_end=216,
+)
+
 DESCRIPTOR.message_types_by_name['PutResponse'] = _PUTRESPONSE
 DESCRIPTOR.message_types_by_name['PutRequest'] = _PUTREQUEST
 DESCRIPTOR.message_types_by_name['GetRequest'] = _GETREQUEST
 DESCRIPTOR.message_types_by_name['GetResponse'] = _GETRESPONSE
+DESCRIPTOR.message_types_by_name['DeleteRequest'] = _DELETEREQUEST
+DESCRIPTOR.message_types_by_name['DeleteResponse'] = _DELETERESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 PutResponse = _reflection.GeneratedProtocolMessageType('PutResponse', (_message.Message,), {
@@ -193,6 +259,20 @@ GetResponse = _reflection.GeneratedProtocolMessageType('GetResponse', (_message.
   })
 _sym_db.RegisterMessage(GetResponse)
 
+DeleteRequest = _reflection.GeneratedProtocolMessageType('DeleteRequest', (_message.Message,), {
+  'DESCRIPTOR' : _DELETEREQUEST,
+  '__module__' : 'gerdu_pb2'
+  # @@protoc_insertion_point(class_scope:gerdu.DeleteRequest)
+  })
+_sym_db.RegisterMessage(DeleteRequest)
+
+DeleteResponse = _reflection.GeneratedProtocolMessageType('DeleteResponse', (_message.Message,), {
+  'DESCRIPTOR' : _DELETERESPONSE,
+  '__module__' : 'gerdu_pb2'
+  # @@protoc_insertion_point(class_scope:gerdu.DeleteResponse)
+  })
+_sym_db.RegisterMessage(DeleteResponse)
+
 
 DESCRIPTOR._options = None
 
@@ -203,8 +283,8 @@ _GERDU = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=153,
-  serialized_end=252,
+  serialized_start=219,
+  serialized_end=373,
   methods=[
   _descriptor.MethodDescriptor(
     name='Put',
@@ -223,6 +303,16 @@ _GERDU = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_GETREQUEST,
     output_type=_GETRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Delete',
+    full_name='gerdu.Gerdu.Delete',
+    index=2,
+    containing_service=None,
+    input_type=_DELETEREQUEST,
+    output_type=_DELETERESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

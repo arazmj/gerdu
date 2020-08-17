@@ -11,4 +11,10 @@ if __name__ == '__main__':
     response = stub.Get(GetRequest(key="Hello"))
     values = response.value.decode("utf-8")
     print("Hello =", values)
+    stub.Delete(DeleteRequest(key="Hello"))
+    try:
+        response = stub.Get(GetRequest(key="Hello"))
+    except:
+        print('The key is deleted successfully')
+
 
