@@ -16,7 +16,13 @@ It also supports for weak reference type of cache where the cache consumes as mu
 <br/>
 
 You can enable [gRPC](https://grpc.io), HTTP and [memcached](https://memcached.org) and enjoy taking advantage of both protocols simultaneously.
- 
+
+## Build
+```Bash
+$go build -v
+```
+
+## Usage
 ```
 Usage of gerdu:
   -capacity string
@@ -71,7 +77,7 @@ $curl --request GET localhost:8080/metrics
 ```
 
 ## Sample applications
-Sample application s available in:
+Sample applications are available in:
 
 
 - C++ ([HTTP](examples/HTTP/CPP), [gRPC](examples/gRPC/CPP))
