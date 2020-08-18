@@ -96,7 +96,7 @@ Sample applications are available in:
 - PHP  ([HTTP](examples/HTTP/PHP/test.php))
 - Python ([HTTP](examples/HTTP/Python/test.py), [gRPC](examples/gRPC/Python/main.py), [memcached](examples/memcached/Python/test.py))
 - R ([HTTP](examples/HTTP/R/main.R))
-- Ruby ([HTTP](examples/HTTP/Ruby/go_cache.rb))
+- Ruby ([HTTP](examples/HTTP/Ruby/go_cache.rb), [gRPC](examples/gRPC/Ruby/main.rb))
 - Rust ([HTTP](examples/HTTP/Rust/main.rs))
 - Scala ([HTTP](examples/HTTP/Scala/src/main/scala/com/amirrazmjou/go/cache/example/Example.scala))
 - Swift ([HTTP](examples/HTTP/Swift/GoCacheSwift/main.swift))
