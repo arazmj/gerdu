@@ -85,7 +85,7 @@ Sample applications are available in:
 - Dart ([HTTP](examples/HTTP/Dart/bin/Dart.dart))
 - Elixir ([HTTP](examples/HTTP/Elixir/lib/go_cache_elixir.ex))
 - Erlang ([HTTP](examples/HTTP/Erlang/src/test_gocache.erl))
-- GoLang ([HTTP](examples/HTTP/GoLang/main.go), [gRPC](examples/gRPC/GoLang/main.go))
+- GoLang ([HTTP](examples/HTTP/GoLang/main.go), [gRPC](examples/gRPC/GoLang/main.go), [memcached](examples/memcached/GoLang/main.go))
 - Groovy ([HTTP](examples/HTTP/Groovy/main.groovy))
 - Haskell ([HTTP](examples/HTTP/Haskell/app/Main.hs))
 - Java ([HTTP](examples/HTTP/Java/src/GoCache.java), [gRPC](examples/gRPC/Java/src/main/java/net/amirrazmjou/Main.java))
