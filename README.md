@@ -75,6 +75,20 @@ $curl --request GET localhost:8080/cache/3
 [Prometheus](https://prometheus.io) metrics
 ```
 $curl --request GET localhost:8080/metrics
+...
+# HELP gerdu_adds_total The total number of new added nodes
+# TYPE gerdu_adds_total counter
+gerdu_adds_total 52152
+# HELP gerdu_deletes_total The total number of deletes nodes
+# TYPE gerdu_deletes_total counter
+gerdu_deletes_total 23
+# HELP gerdu_hits_total The total number of cache hits
+# TYPE gerdu_hits_total counter
+gerdu_hits_total 1563
+# HELP gerdu_misses_total The total number of missed cache hits
+# TYPE gerdu_misses_total counter
+gerdu_misses_total 16
+...
 ```
 
 ## Sample applications
