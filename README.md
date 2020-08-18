@@ -80,7 +80,7 @@ $curl --request GET localhost:8080/metrics
 ## Sample applications
 Sample applications are available in:
 
-- C# ([HTTP](examples/HTTP/CSharp/CSharp/Program.cs))
+- C# ([HTTP](examples/HTTP/CSharp/CSharp/Program.cs), [gRPC](examples/gRPC/CSharp/CSharpGRPC/Program.cs))
 - C++ ([HTTP](examples/HTTP/CPP/main.cpp), [gRPC](examples/gRPC/CPP/main.cpp))
 - Dart ([HTTP](examples/HTTP/Dart/bin/Dart.dart))
 - Elixir ([HTTP](examples/HTTP/Elixir/lib/go_cache_elixir.ex))

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.13.0" />
+      <PackageReference Include="Grpc" Version="2.31.0" />
+      <PackageReference Include="Grpc.Tools" Version="2.31.0" PrivateAssets="All" />
+      <Protobuf Include="proto/gerdu.proto" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="proto" />
+    </ItemGroup>
+
+</Project>
