@@ -1,0 +1,363 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		58C35897415C996890AFF714 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58C3566BCD32EC5DFADB3E05 /* Cocoa.framework */; };
+		6E8220A024ED1386009733EA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E82209F24ED1386009733EA /* main.m */; };
+		F1AA150ADA051FCBB78799E4 /* libPods-GerduGrpcObjC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A43B21764A401F7D1C992D0C /* libPods-GerduGrpcObjC.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6E82209A24ED1386009733EA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		58C3566BCD32EC5DFADB3E05 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		58C35B4828A5867FEBB5B781 /* Gerdu.podspec */ = {isa = PBXFileReference; lastKnownFileType = file.podspec; path = Gerdu.podspec; sourceTree = "<group>"; };
+		6E82209C24ED1386009733EA /* GerduGrpcObjC */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GerduGrpcObjC; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E82209F24ED1386009733EA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		92733D767B4E13C8E16CA667 /* Pods-GerduGrpcObjC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GerduGrpcObjC.release.xcconfig"; path = "Target Support Files/Pods-GerduGrpcObjC/Pods-GerduGrpcObjC.release.xcconfig"; sourceTree = "<group>"; };
+		A43B21764A401F7D1C992D0C /* libPods-GerduGrpcObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GerduGrpcObjC.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F59D02B61E22AD3E127F8ADA /* Pods-GerduGrpcObjC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GerduGrpcObjC.debug.xcconfig"; path = "Target Support Files/Pods-GerduGrpcObjC/Pods-GerduGrpcObjC.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6E82209924ED1386009733EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1AA150ADA051FCBB78799E4 /* libPods-GerduGrpcObjC.a in Frameworks */,
+				58C35897415C996890AFF714 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		45C8501721DC94C0080510AB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A43B21764A401F7D1C992D0C /* libPods-GerduGrpcObjC.a */,
+				58C3566BCD32EC5DFADB3E05 /* Cocoa.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		58C3574A007E87E3FCDABAC5 /* proto */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = proto;
+			sourceTree = "<group>";
+		};
+		6E82209324ED1386009733EA = {
+			isa = PBXGroup;
+			children = (
+				6E82209E24ED1386009733EA /* GerduGrpcObjC */,
+				6E82209D24ED1386009733EA /* Products */,
+				83F4C00460DDCF1EC0CA218E /* Pods */,
+				45C8501721DC94C0080510AB /* Frameworks */,
+				58C35B4828A5867FEBB5B781 /* Gerdu.podspec */,
+				58C3574A007E87E3FCDABAC5 /* proto */,
+			);
+			sourceTree = "<group>";
+		};
+		6E82209D24ED1386009733EA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6E82209C24ED1386009733EA /* GerduGrpcObjC */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6E82209E24ED1386009733EA /* GerduGrpcObjC */ = {
+			isa = PBXGroup;
+			children = (
+				6E82209F24ED1386009733EA /* main.m */,
+			);
+			path = GerduGrpcObjC;
+			sourceTree = "<group>";
+		};
+		83F4C00460DDCF1EC0CA218E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F59D02B61E22AD3E127F8ADA /* Pods-GerduGrpcObjC.debug.xcconfig */,
+				92733D767B4E13C8E16CA667 /* Pods-GerduGrpcObjC.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6E82209B24ED1386009733EA /* GerduGrpcObjC */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6E8220A324ED1386009733EA /* Build configuration list for PBXNativeTarget "GerduGrpcObjC" */;
+			buildPhases = (
+				D4FA03EC52C38814BEEAC192 /* [CP] Check Pods Manifest.lock */,
+				6E82209824ED1386009733EA /* Sources */,
+				6E82209924ED1386009733EA /* Frameworks */,
+				6E82209A24ED1386009733EA /* CopyFiles */,
+				79650B34E898B16DE616C5D2 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GerduGrpcObjC;
+			productName = GerduGrpcObjC;
+			productReference = 6E82209C24ED1386009733EA /* GerduGrpcObjC */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6E82209424ED1386009733EA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1160;
+				ORGANIZATIONNAME = "Amir Razmjou";
+				TargetAttributes = {
+					6E82209B24ED1386009733EA = {
+						CreatedOnToolsVersion = 11.6;
+					};
+				};
+			};
+			buildConfigurationList = 6E82209724ED1386009733EA /* Build configuration list for PBXProject "GerduGrpcObjC" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6E82209324ED1386009733EA;
+			productRefGroup = 6E82209D24ED1386009733EA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6E82209B24ED1386009733EA /* GerduGrpcObjC */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		79650B34E898B16DE616C5D2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GerduGrpcObjC/Pods-GerduGrpcObjC-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GerduGrpcObjC/Pods-GerduGrpcObjC-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GerduGrpcObjC/Pods-GerduGrpcObjC-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D4FA03EC52C38814BEEAC192 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-GerduGrpcObjC-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6E82209824ED1386009733EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E8220A024ED1386009733EA /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6E8220A124ED1386009733EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6E8220A224ED1386009733EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6E8220A424ED1386009733EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F59D02B61E22AD3E127F8ADA /* Pods-GerduGrpcObjC.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6E8220A524ED1386009733EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 92733D767B4E13C8E16CA667 /* Pods-GerduGrpcObjC.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6E82209724ED1386009733EA /* Build configuration list for PBXProject "GerduGrpcObjC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6E8220A124ED1386009733EA /* Debug */,
+				6E8220A224ED1386009733EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6E8220A324ED1386009733EA /* Build configuration list for PBXNativeTarget "GerduGrpcObjC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6E8220A424ED1386009733EA /* Debug */,
+				6E8220A524ED1386009733EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6E82209424ED1386009733EA /* Project object */;
+}

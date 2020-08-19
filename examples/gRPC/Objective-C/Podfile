@@ -1,0 +1,13 @@
+project 'GerduGrpcObjC.xcodeproj'
+
+platform :osx, '10.15'
+
+target 'GerduGrpcObjC' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  # use_frameworks!
+
+  # Pods for GerduGrpcObjC
+  pod 'Gerdu', :path => '.'
+  pod 'gRPC'
+  pod 'Protobuf'
+end

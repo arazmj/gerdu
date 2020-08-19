@@ -105,7 +105,7 @@ Sample applications are available in:
 - Java ([HTTP](examples/HTTP/Java/src/GoCache.java), [gRPC](examples/gRPC/Java/src/main/java/net/amirrazmjou/Main.java))
 - Kotlin ([HTTP](examples/HTTP/Kotlin/src/Main.kt))
 - NodeJS ([HTTP](examples/HTTP/NodeJS/app.js))
-- Objective-C ([HTTP](examples/HTTP/Objective-C/main.m))
+- Objective-C ([HTTP](examples/HTTP/Objective-C/main.m), [gRPC](examples/gRPC/Objective-C/GerduGrpcObjC/main.m))
 - Perl ([HTTP](examples/HTTP/Perl/main.pl))
 - PHP  ([HTTP](examples/HTTP/PHP/test.php))
 - Python ([HTTP](examples/HTTP/Python/test.py), [gRPC](examples/gRPC/Python/main.py), [memcached](examples/memcached/Python/test.py))

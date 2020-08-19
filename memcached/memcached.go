@@ -10,30 +10,30 @@ import (
 
 //Serve start memcached server
 func Serve(host string, gerdu cache.UnImplementedCache) {
-	mockServer := mc.NewServer(host)
-	mockServer.RegisterFunc("get", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server := mc.NewServer(host)
+	server.RegisterFunc("get", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return getHandler(ctx, req, res, gerdu)
 	})
-	mockServer.RegisterFunc("gets", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server.RegisterFunc("gets", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return getHandler(ctx, req, res, gerdu)
 	})
-	mockServer.RegisterFunc("set", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server.RegisterFunc("set", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return setHandler(ctx, req, res, gerdu)
 	})
-	mockServer.RegisterFunc("delete", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server.RegisterFunc("delete", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return deleteHandler(ctx, req, res, gerdu)
 
 	})
-	mockServer.RegisterFunc("incr", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server.RegisterFunc("incr", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return incrHandler(ctx, req, res, gerdu)
 	})
-	mockServer.RegisterFunc("flush_all", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server.RegisterFunc("flush_all", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return flushAllHandler(ctx, req, res, gerdu)
 	})
-	mockServer.RegisterFunc("version", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
+	server.RegisterFunc("version", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return versionHandler(ctx, req, res, gerdu)
 	})
-	mockServer.Start()
+	server.Start()
 }
 
 func getHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu cache.UnImplementedCache) error {
@@ -92,11 +92,14 @@ func incrHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu c
 		var err error
 		base, err = strconv.ParseInt(value, 10, 64)
 		if err != nil {
+			log.Printf("Memcached INCREMENT Key %v is not valid \n", key)
 			return err
 		}
 	}
 
 	value := strconv.FormatInt(base+increment, 10)
+	log.Printf("Memcached INCREMENTED Key value to value %s\n", key, req.Value, value)
+
 	gerdu.Put(key, value)
 
 	res.Response = value
