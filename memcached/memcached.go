@@ -98,7 +98,7 @@ func incrHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu c
 	}
 
 	value := strconv.FormatInt(base+increment, 10)
-	log.Printf("Memcached INCREMENTED Key value to value %s\n", key, req.Value, value)
+	log.Printf("Memcached INCREMENTED Key %s value %s to value %s\n", key, req.Value, value)
 
 	gerdu.Put(key, value)
 
