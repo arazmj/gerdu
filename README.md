@@ -16,7 +16,7 @@ Currently, it supports two eviction policy [LFU](https://en.wikipedia.org/wiki/L
 It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
 <br/>
 
-You can enable [gRPC](https://grpc.io), HTTP and [memcached](https://memcached.org) and enjoy taking advantage of both protocols simultaneously.
+You can enable [gRPC](https://grpc.io), HTTP and [memcached](https://memcached.org) and enjoy taking advantage of all protocols simultaneously.
 
 ## Build
 ```Bash
@@ -56,19 +56,23 @@ Usage of gerdu:
 ## Example
 Example of usage:
 To insert or update or delete a key 
-```Bash
-$./gerdu --protocols grpc,http,mcd # runs gerdu in all modes 
-$curl --request PUT --data '1' http://localhost:8080/cache/1
-$curl --request PUT --data '2' http://localhost:8080/cache/2
-$curl --request PUT --data '3' http://localhost:8080/cache/3
-$curl --request PUT --data 'some new value' http://localhost:8080/cache/3
-$curl --request DELETE http://localhost:8080/cache/3 # Delete key 3
-$curl --request GET localhost:8080/cache/3 # Not found 404
+```console
+foo@bar:~$ ./gerdu --protocols=http,grpc,mcd  
+INFO[0000] Gerdu started listening HTTP on 127.0.0.1:8080 
+INFO[0000] Gerdu started memcached server on 127.0.0.1:11211 
+INFO[0000] Gerdu started listening gRPC on 127.0.0.1:8081 
+
+foo@bar:~$ curl --request PUT --data '1' http://localhost:8080/cache/1
+foo@bar:~$ curl --request PUT --data '2' http://localhost:8080/cache/2
+foo@bar:~$ curl --request PUT --data '3' http://localhost:8080/cache/3
+foo@bar:~$ curl --request PUT --data 'some new value' http://localhost:8080/cache/3
+foo@bar:~$ curl --request DELETE http://localhost:8080/cache/3 # Delete key 3
+foo@bar:~$ curl --request GET localhost:8080/cache/3 # Not found 404
 ```
 
 To retrieve the key
 ```Bash
-$curl --request GET localhost:8080/cache/3
+foo@bar:~$ curl --request GET localhost:8080/cache/3
 ```
 
 ## Telemetry 
