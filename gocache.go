@@ -35,7 +35,7 @@ var (
 	mcdPort   = flag.Int("mcdport", 11211, "the memcached server port number")
 	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
 	protocols = flag.String("protocols", "http",
-		"protocol 'grpc', 'http' or 'mcd' (memcached), multiple values can be selected separated by comma")
+		"protocol 'grpc', 'http' or 'mcd' (memcached), multiple comma-separated values")
 	tlsKey  = flag.String("key", "", "SSL certificate private key")
 	tlsCert = flag.String("cert", "", "SSL certificate public key")
 	host    = flag.String("host", "127.0.0.1", "The host that server listens")

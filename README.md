@@ -48,7 +48,7 @@ Usage of gerdu:
   -mcdport int
         the memcached server port number (default 11211)
   -protocols string
-        protocol 'grpc', 'http' or 'mcd' (memcached), multiple values can be selected separated by comma (default "http")
+        protocol 'grpc', 'http' or 'mcd' (memcached), multiple comma-separated values (default "http")
   -type string
         type of cache, lru or lfu, weak (default "lru")
 ```
