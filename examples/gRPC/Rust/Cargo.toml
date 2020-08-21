@@ -1,0 +1,10 @@
+[package]
+name = "gerdu_rust_grpc"
+version = "0.1.0"
+authors = ["Amir Razmjou <arazmj@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+protobuf = { version = "2.0"}
+futures = "0.3.5"
+grpcio = "0.6.0"

@@ -111,6 +111,6 @@ Sample applications are available in:
 - Python ([HTTP](examples/HTTP/Python/test.py), [gRPC](examples/gRPC/Python/main.py), [memcached](examples/memcached/Python/test.py))
 - R ([HTTP](examples/HTTP/R/main.R))
 - Ruby ([HTTP](examples/HTTP/Ruby/go_cache.rb), [gRPC](examples/gRPC/Ruby/main.rb))
-- Rust ([HTTP](examples/HTTP/Rust/main.rs))
+- Rust ([HTTP](examples/HTTP/Rust/main.rs), [gRPC](examples/gRPC/Rust/src/main.rs))
 - Scala ([HTTP](examples/HTTP/Scala/src/main/scala/com/amirrazmjou/go/cache/example/Example.scala))
 - Swift ([HTTP](examples/HTTP/Swift/GoCacheSwift/main.swift))
