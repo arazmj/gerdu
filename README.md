@@ -19,8 +19,8 @@ It also supports for weak reference type of cache where the cache consumes as mu
 You can enable [gRPC](https://grpc.io), HTTP and [memcached](https://memcached.org) and enjoy taking advantage of all protocols simultaneously.
 
 ## Build
-```Bash
-$go build -v
+```bash
+go build -v
 ```
 
 ## Usage
@@ -63,6 +63,8 @@ INFO[0000] Gerdu started memcached server on 127.0.0.1:11211
 INFO[0000] Gerdu started listening gRPC on 127.0.0.1:8081 
 
 foo@bar:~$ curl --request PUT --data '1' http://localhost:8080/cache/1
+foo@bar:~$ curl --request GET --data '1' http://localhost:8080/cache/1
+1
 foo@bar:~$ curl --request PUT --data '2' http://localhost:8080/cache/2
 foo@bar:~$ curl --request PUT --data '3' http://localhost:8080/cache/3
 foo@bar:~$ curl --request PUT --data 'some new value' http://localhost:8080/cache/3
@@ -77,8 +79,8 @@ foo@bar:~$ curl --request GET localhost:8080/cache/3
 
 ## Telemetry 
 [Prometheus](https://prometheus.io) metrics
-```
-$curl --request GET localhost:8080/metrics
+```console
+foo@bar:~$ curl --request GET localhost:8080/metrics
 ...
 # HELP gerdu_adds_total The total number of new added nodes
 # TYPE gerdu_adds_total counter
