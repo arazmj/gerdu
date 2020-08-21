@@ -8,7 +8,7 @@
 [![codebeat badge](https://codebeat.co/badges/05010b5e-17d9-4f5d-a6bb-2c330ff364c8)](https://codebeat.co/projects/github-com-arazmj-gerdu-master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/arazmj/gerdu/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/arazmj/gerdu/?branch=master)
 
-# Gerdu
+![Gerdu](https://github.com/arazmj/gerdu/blob/assets/gerdu_banner.png?raw=true)
 
 ## About
 Gerdu is a key-value in-memory database server written in [Go](http://golang.org) programming language.
