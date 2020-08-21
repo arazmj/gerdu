@@ -57,7 +57,7 @@ Usage of gerdu:
 Example of usage:
 To insert or update or delete a key 
 ```console
-foo@bar:~$ ./gerdu --protocols=http,grpc,mcd  
+foo@bar:~$ ./gerdu --protocols=http,grpc,mcd --log trace
 INFO[0000] Gerdu started listening HTTP on 127.0.0.1:8080 
 INFO[0000] Gerdu started memcached server on 127.0.0.1:11211 
 INFO[0000] Gerdu started listening gRPC on 127.0.0.1:8081 
