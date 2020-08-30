@@ -11,7 +11,7 @@
 ![Gerdu](https://github.com/arazmj/gerdu/blob/assets/gerdu_banner.png?raw=true)
 
 ## About
-Gerdu is a key-value in-memory database server written in [Go](http://golang.org) programming language.
+Gerdu is a distributed key-value in-memory database server written in [Go](http://golang.org) programming language.
 Currently, it supports two eviction policy [LFU](https://en.wikipedia.org/wiki/Least_frequently_used) and [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)). 
 It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
 <br/>
@@ -27,30 +27,38 @@ go build -v
 ```
 Usage of gerdu:
   -capacity string
-        The size of cache, once cache reached this capacity old values will evicted.
-        Specify a numerical value followed by one of the following units (not case sensitive)
-        K or KB: Kilobytes
-        M or MB: Megabytes
-        G or GB: Gigabytes
-        T or TB: Terabytes (default "64MB")
+    	The size of cache, once cache reached this capacity old values will evicted.
+    	Specify a numerical value followed by one of the following units (not case sensitive)
+    	K or KB: Kilobytes
+    	M or MB: Megabytes
+    	G or GB: Gigabytes
+    	T or TB: Terabytes (default "64MB")
   -cert string
-        SSL certificate public key
+    	SSL certificate public key
   -grpcport int
-        the grpc server port number (default 8081)
+    	the grpc server port number (default 8081)
   -host string
-        The host that server listens (default "127.0.0.1")
+    	The host that server listens (default "127.0.0.1")
   -httpport int
-        the http server port number (default 8080)
+    	the http server port number (default 8080)
+  -id string
+    	Node ID (default "master")
+  -join string
+    	Set join address, if any
   -key string
-        SSL certificate private key
+    	SSL certificate private key
   -log string
-        log level can be any of values of 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace' (default "error")
+    	log level can be any of values of 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace' (default "info")
   -mcdport int
-        the memcached server port number (default 11211)
+    	the memcached server port number (default 11211)
   -protocols string
-        protocol 'grpc', 'http' or 'mcd' (memcached), multiple comma-separated values (default "http")
+    	protocol 'grpc' or 'mcd' (memcached), multiple comma-separated values, http is not optional
+  -raft string
+    	Set Raft bind address (default "127.0.0.1:12000")
+  -storage string
+    	Path to store log files and snapshot, will store in memory if not set
   -type string
-        type of cache, lru or lfu, weak (default "lru")
+    	type of cache, lru or lfu, weak (default "lru")
 ```
 
 ## Example
@@ -75,6 +83,14 @@ foo@bar:~$ curl --request GET localhost:8080/cache/3 # Not found 404
 To retrieve the key
 ```Bash
 foo@bar:~$ curl --request GET localhost:8080/cache/3
+```
+
+## Distributed Mode
+Gerdu can be ran in either single mode or distributed mode. 
+You need to specify `--raft`, `--id`, `--join` parameters to join an existing node. 
+```Bash
+foo@bar:~$ ./gerdu -httpport 8083 --join :8080 --id node1 --raft :12003
+foo@bar:~$ ./gerdu -httpport 8084 --join :8080 --id node2 --raft :12004
 ```
 
 ## Telemetry 

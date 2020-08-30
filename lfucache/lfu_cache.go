@@ -2,15 +2,20 @@
 package lfucache
 
 import (
+	"encoding/json"
+	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/dlinklist"
 	"github.com/arazmj/gerdu/metrics"
+	"github.com/hashicorp/raft"
 	"github.com/inhies/go-bytesize"
+	"io"
 	"sync"
 )
 
 // LFUCache data structure
 type LFUCache struct {
-	sync.Mutex
+	sync.RWMutex
+	cache.UnImplementedCache
 	size     bytesize.ByteSize
 	capacity bytesize.ByteSize
 	node     map[string]*dlinklist.Node
@@ -159,3 +164,62 @@ func (c *LFUCache) Delete(key string) (ok bool) {
 	delete(c.node, key)
 	return true
 }
+
+func (c *LFUCache) Snapshot() (raft.FSMSnapshot, error) {
+	c.RLock()
+	defer c.RUnlock()
+
+	o := make(map[string]string)
+
+	for k, v := range c.node {
+		o[k] = v.Value
+	}
+
+	return &fsmSnapshot{store: o}, nil
+
+}
+
+func (c *LFUCache) Restore(closer io.ReadCloser) error {
+	o := make(map[string]string)
+	if err := json.NewDecoder(closer).Decode(&o); err != nil {
+		return err
+	}
+
+	// Set the state from the snapshot, no lock required according to
+	// Hashicorp docs.
+	for k, v := range o {
+		c.Put(k, v)
+	}
+
+	return nil
+}
+
+type fsmSnapshot struct {
+	store map[string]string
+}
+
+func (f *fsmSnapshot) Persist(sink raft.SnapshotSink) error {
+	err := func() error {
+		// Encode data.
+		b, err := json.Marshal(f.store)
+		if err != nil {
+			return err
+		}
+
+		// Write data to sink.
+		if _, err := sink.Write(b); err != nil {
+			return err
+		}
+
+		// Close the sink.
+		return sink.Close()
+	}()
+
+	if err != nil {
+		sink.Cancel()
+	}
+
+	return err
+}
+
+func (f *fsmSnapshot) Release() {}

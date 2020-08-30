@@ -2,7 +2,9 @@ package httpserver
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/arazmj/gerdu/cache"
+	"github.com/arazmj/gerdu/raftproxy"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
@@ -20,8 +22,43 @@ func newRouter(gerdu cache.UnImplementedCache) (router *mux.Router) {
 	router.HandleFunc("/cache/{key}", func(w http.ResponseWriter, r *http.Request) {
 		deleteHandler(w, r, gerdu)
 	}).Methods(http.MethodDelete)
+	router.HandleFunc("/join", func(w http.ResponseWriter, r *http.Request) {
+		joinHandler(w, r, gerdu)
+	}).Methods(http.MethodPost)
 	router.Handle("/metrics", promhttp.Handler())
 	return router
+}
+
+func joinHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {
+	raftCache := gerdu.(*raftproxy.RaftProxy)
+	m := map[string]string{}
+	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if len(m) != 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	remoteAddr, ok := m["addr"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	nodeID, ok := m["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := raftCache.Join(nodeID, remoteAddr); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Infof("Node %s, remoteAddr %s joined", nodeID, remoteAddr)
 }
 
 //HTTPServe start http server in plain text

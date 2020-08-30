@@ -2,22 +2,24 @@ package main
 
 import (
 	"flag"
-	"github.com/arazmj/gerdu/cache"
+	cache "github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/grpcserver"
 	"github.com/arazmj/gerdu/httpserver"
 	"github.com/arazmj/gerdu/lfucache"
 	"github.com/arazmj/gerdu/lrucache"
 	"github.com/arazmj/gerdu/memcached"
+	"github.com/arazmj/gerdu/raftproxy"
 	"github.com/arazmj/gerdu/weakcache"
 	"github.com/inhies/go-bytesize"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
 )
 
-var gerdu cache.UnImplementedCache
+var gerdu raftproxy.RaftCache
 var wg = sync.WaitGroup{}
 
 var (
@@ -34,12 +36,17 @@ var (
 	grpcPort  = flag.Int("grpcport", 8081, "the grpc server port number")
 	mcdPort   = flag.Int("mcdport", 11211, "the memcached server port number")
 	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
-	protocols = flag.String("protocols", "http",
-		"protocol 'grpc', 'http' or 'mcd' (memcached), multiple comma-separated values")
-	tlsKey  = flag.String("key", "", "SSL certificate private key")
-	tlsCert = flag.String("cert", "", "SSL certificate public key")
-	host    = flag.String("host", "127.0.0.1", "The host that server listens")
-	secure  = len(*tlsCert) > 0 && len(*tlsKey) > 0
+	protocols = flag.String("protocols", "",
+		"protocol 'grpc' or 'mcd' (memcached), multiple comma-separated values, http is not optional")
+	tlsKey   = flag.String("key", "", "SSL certificate private key")
+	tlsCert  = flag.String("cert", "", "SSL certificate public key")
+	host     = flag.String("host", "127.0.0.1", "The host that server listens")
+	raftAddr = flag.String("raft", "127.0.0.1:12000", "Set Raft bind address")
+	joinAddr = flag.String("join", "", "Set join address, if any")
+	nodeID   = flag.String("id", "master", "Node ID")
+	storage  = flag.String("storage", "", "Path to store log files and snapshot, will store in memory if not set")
+
+	secure = len(*tlsCert) > 0 && len(*tlsKey) > 0
 )
 
 func main() {
@@ -51,22 +58,19 @@ func main() {
 
 func serve() {
 	*protocols = strings.ToLower(*protocols)
-	var validProtocol bool
-	if strings.Contains(*protocols, "http") {
-		validProtocol = true
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			httpHost := *host + ":" + strconv.Itoa(*httpPort)
-			if secure {
-				httpserver.HTTPServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
-			} else {
-				httpserver.HTTPServe(httpHost, gerdu)
-			}
-		}()
-	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		httpHost := *host + ":" + strconv.Itoa(*httpPort)
+		if secure {
+			httpserver.HTTPServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
+		} else {
+			httpserver.HTTPServe(httpHost, gerdu)
+		}
+	}()
+
 	if strings.Contains(*protocols, "grpc") {
-		validProtocol = true
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -79,7 +83,6 @@ func serve() {
 		}()
 	}
 	if strings.Contains(*protocols, "mcd") {
-		validProtocol = true
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -91,11 +94,13 @@ func serve() {
 			memcached.Serve(mcdHost, gerdu)
 		}()
 	}
-	if !validProtocol {
-		log.Fatalf("Invalid value for protocol")
-		os.Exit(1)
-	}
+
 	wg.Wait()
+
+	terminate := make(chan os.Signal, 1)
+	signal.Notify(terminate, os.Interrupt)
+	<-terminate
+	log.Println("Gerdu exiting")
 }
 
 func setCache() {
@@ -104,16 +109,23 @@ func setCache() {
 		log.Fatal("Invalid value for capacity", err.Error())
 	}
 
+	var c cache.UnImplementedCache
 	if strings.ToLower(*kind) == "lru" {
-		gerdu = lrucache.NewCache(capacity)
+		c = lrucache.NewCache(capacity)
 	} else if strings.ToLower(*kind) == "lfu" {
-		gerdu = lfucache.NewCache(capacity)
+		c = lfucache.NewCache(capacity)
 	} else if strings.ToLower(*kind) == "weak" {
-		gerdu = weakcache.NewWeakCache()
+		c = weakcache.NewWeakCache()
 	} else {
 		log.Fatalf("Invalid value for type")
 		os.Exit(1)
 	}
+	gerdu = raftproxy.NewRaftProxy(c, *raftAddr, *joinAddr, *nodeID)
+	err = gerdu.OpenRaft(*storage)
+	if err != nil {
+		log.Fatalf("Cannot open raft peer connection: %s", err)
+	}
+
 }
 
 func setLogLevel() {
@@ -131,6 +143,7 @@ func setLogLevel() {
 	case "debug":
 		log.SetLevel(log.DebugLevel)
 	case "trace":
+		log.SetReportCaller(true)
 		log.SetLevel(log.DebugLevel)
 	default:
 		log.Fatalf("Invalid log level value %s\n", *loglevel)
