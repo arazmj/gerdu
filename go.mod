@@ -14,6 +14,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.12.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
+	github.com/tidwall/redcon v1.3.2
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/genproto v0.0.0-20200815001618-f69a88009b70 // indirect

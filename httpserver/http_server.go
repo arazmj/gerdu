@@ -64,14 +64,14 @@ func joinHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplement
 //HTTPServe start http server in plain text
 func HTTPServe(host string, gerdu cache.UnImplementedCache) {
 	router := newRouter(gerdu)
-	log.Infof("Gerdu started listening HTTP on %s\n", host)
+	log.Infof("Gerdu started listening HTTP at %s\n", host)
 	log.Fatal(http.ListenAndServe(host, router))
 }
 
 //HTTPServeTLS start HTTP server in secure mode
 func HTTPServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCache) {
 	router := newRouter(gerdu)
-	log.Printf("Gerdu started listening HTTPS TLS on %s\n", host)
+	log.Printf("Gerdu started listening HTTPS TLS at %s\n", host)
 	log.Fatal(http.ListenAndServeTLS(host, tlsCert, tlsKey, router))
 }
 

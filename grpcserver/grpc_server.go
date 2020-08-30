@@ -18,7 +18,7 @@ type server struct {
 
 func grpcServe(s *grpc.Server, host string, gerdu cache.UnImplementedCache) {
 	lis, err := net.Listen("tcp", host)
-	log.Printf("Gerdu started listening gRPC on %s\n", host)
+	log.Printf("Gerdu started listening gRPC at %s\n", host)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

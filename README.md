@@ -16,7 +16,14 @@ Currently, it supports two eviction policy [LFU](https://en.wikipedia.org/wiki/L
 It also supports for weak reference type of cache where the cache consumes as much memory as the garbage collector allows it to use.
 <br/>
 
-You can enable [gRPC](https://grpc.io), HTTP and [memcached](https://memcached.org) and enjoy taking advantage of all protocols simultaneously.
+You can enable [gRPC](https://grpc.io), [redis](https://redis.io) HTTP and [memcached](https://memcached.org) and enjoy taking advantage of all protocols simultaneously.
+
+## Features
+- Wire protocol support for Redis and memcached
+- Different eviction policy LRU, LFU, weak
+- gRPC and HTTP protocol support
+- Distributed and fault-tolerant via Raft 
+- Telemetry features through Prometheus 
 
 ## Build
 ```bash

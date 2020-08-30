@@ -9,6 +9,7 @@ import (
 	"github.com/arazmj/gerdu/lrucache"
 	"github.com/arazmj/gerdu/memcached"
 	"github.com/arazmj/gerdu/raftproxy"
+	"github.com/arazmj/gerdu/redis"
 	"github.com/arazmj/gerdu/weakcache"
 	"github.com/inhies/go-bytesize"
 	log "github.com/sirupsen/logrus"
@@ -32,12 +33,13 @@ var (
 			"\nM or MB: Megabytes"+
 			"\nG or GB: Gigabytes"+
 			"\nT or TB: Terabytes")
-	httpPort  = flag.Int("httpport", 8080, "the http server port number")
-	grpcPort  = flag.Int("grpcport", 8081, "the grpc server port number")
-	mcdPort   = flag.Int("mcdport", 11211, "the memcached server port number")
+	httpPort  = flag.Int("httpport", 8080, "http server port number")
+	grpcPort  = flag.Int("grpcport", 8081, "grpc server port number")
+	mcdPort   = flag.Int("mcdport", 11211, "memcached server port number")
+	redisPort = flag.Int("redisport", 6379, "redis server port number")
 	kind      = flag.String("type", "lru", "type of cache, lru or lfu, weak")
 	protocols = flag.String("protocols", "",
-		"protocol 'grpc' or 'mcd' (memcached), multiple comma-separated values, http is not optional")
+		"protocol 'grpc', 'redis' or 'mcd' (memcached), multiple comma-separated values, http is not optional")
 	tlsKey   = flag.String("key", "", "SSL certificate private key")
 	tlsCert  = flag.String("cert", "", "SSL certificate public key")
 	host     = flag.String("host", "127.0.0.1", "The host that server listens")
@@ -92,6 +94,19 @@ func serve() {
 				os.Exit(1)
 			}
 			memcached.Serve(mcdHost, gerdu)
+		}()
+	}
+
+	if strings.Contains(*protocols, "redis") {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			redisHost := *host + ":" + strconv.Itoa(*redisPort)
+			if secure {
+				redis.ServeTLS(redisHost, *tlsCert, *tlsKey, gerdu)
+			} else {
+				redis.Serve(redisHost, gerdu)
+			}
 		}()
 	}
 
