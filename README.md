@@ -94,7 +94,10 @@ foo@bar:~$ curl --request GET localhost:8080/cache/3
 
 ## Distributed Mode
 Gerdu can be ran in either single mode or distributed mode. 
-You need to specify `--raft`, `--id`, `--join` parameters to join an existing node. 
+You need to specify `--raft`, `--id`, `--join` parameters to join an existing node. <br>
+A Gerdu cluster of 3 nodes can tolerate a single node failure, while a cluster of 5 can tolerate 2 node failures. The recommended configuration is to either run 3 or 5 raft servers. This maximizes availability without greatly sacrificing performance.
+
+
 ```Bash
 foo@bar:~$ ./gerdu -httpport 8083 --join :8080 --id node1 --raft :12003
 foo@bar:~$ ./gerdu -httpport 8084 --join :8080 --id node2 --raft :12004
