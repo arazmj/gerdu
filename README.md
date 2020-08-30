@@ -59,7 +59,7 @@ Usage of gerdu:
   -mcdport int
     	the memcached server port number (default 11211)
   -protocols string
-    	protocol 'grpc' or 'mcd' (memcached), multiple comma-separated values, http is not optional
+    	protocol 'grpc', 'redis' or 'mcd' (memcached), multiple comma-separated values, http is not optional
   -raft string
     	Set Raft bind address (default "127.0.0.1:12000")
   -storage string
