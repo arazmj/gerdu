@@ -25,40 +25,11 @@ func newRouter(gerdu cache.UnImplementedCache) (router *mux.Router) {
 	router.HandleFunc("/join", func(w http.ResponseWriter, r *http.Request) {
 		joinHandler(w, r, gerdu)
 	}).Methods(http.MethodPost)
+	router.HandleFunc("/leave", func(w http.ResponseWriter, r *http.Request) {
+		leaveHandler(w, r, gerdu)
+	}).Methods(http.MethodPost)
 	router.Handle("/metrics", promhttp.Handler())
 	return router
-}
-
-func joinHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {
-	raftCache := gerdu.(*raftproxy.RaftProxy)
-	m := map[string]string{}
-	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if len(m) != 2 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	remoteAddr, ok := m["addr"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	nodeID, ok := m["id"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if err := raftCache.Join(nodeID, remoteAddr); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	log.Infof("Node %s, remoteAddr %s joined", nodeID, remoteAddr)
 }
 
 //HTTPServe start http server in plain text
@@ -123,4 +94,54 @@ func deleteHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImpleme
 		log.Printf("HTTP MISSED Key: %s \n", key)
 		w.WriteHeader(http.StatusNotFound)
 	}
+}
+
+func joinHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {
+	raftCache := gerdu.(*raftproxy.RaftProxy)
+	m := map[string]string{}
+	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if len(m) != 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	remoteAddr, ok := m["addr"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	nodeID, ok := m["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := raftCache.Join(nodeID, remoteAddr); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Infof("Node %s, remoteAddr %s joined", nodeID, remoteAddr)
+}
+
+func leaveHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {
+	raftCache := gerdu.(*raftproxy.RaftProxy)
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r.Body)
+	nodeId := buf.String()
+
+	if nodeId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := raftCache.Leave(nodeId); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Infof("Node %s has left", nodeId)
 }

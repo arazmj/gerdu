@@ -272,3 +272,18 @@ func (c *RaftProxy) Join(nodeID, addr string) error {
 	log.Infof("node %s at %s joined successfully", nodeID, addr)
 	return nil
 }
+
+func (c *RaftProxy) Leave(nodeID string) error {
+	configFuture := c.raft.GetConfiguration()
+	if err := configFuture.Error(); err != nil {
+		log.Errorf("failed to get raft configuration: %v", err)
+		return err
+	}
+
+	future := c.raft.RemoveServer(raft.ServerID(nodeID), 0, 0)
+	if err := future.Error(); err != nil {
+		error := fmt.Sprintf("error removing existing node %s: %s", nodeID, err.Error())
+		return errors.New(error)
+	}
+	return nil
+}

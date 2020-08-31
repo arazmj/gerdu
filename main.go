@@ -17,11 +17,9 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 var gerdu raftproxy.RaftCache
-var wg = sync.WaitGroup{}
 
 var (
 	loglevel = flag.String("log", "info",
@@ -43,7 +41,7 @@ var (
 	tlsKey   = flag.String("key", "", "SSL certificate private key")
 	tlsCert  = flag.String("cert", "", "SSL certificate public key")
 	host     = flag.String("host", "127.0.0.1", "The host that server listens")
-	raftAddr = flag.String("raft", "127.0.0.1:12000", "Set Raft bind address")
+	raftAddr = flag.String("raft", "127.0.0.1:12000", "Set raft bind address")
 	joinAddr = flag.String("join", "", "Set join address, if any")
 	nodeID   = flag.String("id", "master", "Node ID")
 	storage  = flag.String("storage", "", "Path to store log files and snapshot, will store in memory if not set")
@@ -61,9 +59,7 @@ func main() {
 func serve() {
 	*protocols = strings.ToLower(*protocols)
 
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
 		httpHost := *host + ":" + strconv.Itoa(*httpPort)
 		if secure {
 			httpserver.HTTPServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
@@ -73,9 +69,7 @@ func serve() {
 	}()
 
 	if strings.Contains(*protocols, "grpc") {
-		wg.Add(1)
 		go func() {
-			defer wg.Done()
 			grpcHost := *host + ":" + strconv.Itoa(*grpcPort)
 			if secure {
 				grpcserver.GrpcServeTLS(grpcHost, *tlsCert, *tlsKey, gerdu)
@@ -85,9 +79,7 @@ func serve() {
 		}()
 	}
 	if strings.Contains(*protocols, "mcd") {
-		wg.Add(1)
 		go func() {
-			defer wg.Done()
 			mcdHost := *host + ":" + strconv.Itoa(*mcdPort)
 			if secure {
 				log.Fatalln("Memcached protocol does not support TLS")
@@ -98,9 +90,7 @@ func serve() {
 	}
 
 	if strings.Contains(*protocols, "redis") {
-		wg.Add(1)
 		go func() {
-			defer wg.Done()
 			redisHost := *host + ":" + strconv.Itoa(*redisPort)
 			if secure {
 				redis.ServeTLS(redisHost, *tlsCert, *tlsKey, gerdu)
@@ -110,12 +100,15 @@ func serve() {
 		}()
 	}
 
-	wg.Wait()
-
 	terminate := make(chan os.Signal, 1)
 	signal.Notify(terminate, os.Interrupt)
 	<-terminate
-	log.Println("Gerdu exiting")
+	err := gerdu.(*raftproxy.RaftProxy).Leave(*nodeID)
+	if err != nil {
+		log.Errorf("Cannot leave the cluster gracefully %v", err)
+	} else {
+		log.Println("Gerdu exiting")
+	}
 }
 
 func setCache() {
