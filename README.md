@@ -72,24 +72,24 @@ Usage of gerdu:
 Example of usage:
 To insert or update or delete a key 
 ```console
-foo@bar:~$ ./gerdu --protocols=http,grpc,mcd --log trace
+$ ./gerdu --protocols=http,grpc,mcd --log trace
 INFO[0000] Gerdu started listening HTTP on 127.0.0.1:8080 
 INFO[0000] Gerdu started memcached server on 127.0.0.1:11211 
 INFO[0000] Gerdu started listening gRPC on 127.0.0.1:8081 
 
-foo@bar:~$ curl --request PUT --data '1' http://localhost:8080/cache/1
-foo@bar:~$ curl --request GET --data '1' http://localhost:8080/cache/1
+$ curl --request PUT --data '1' http://localhost:8080/cache/1
+$ curl --request GET --data '1' http://localhost:8080/cache/1
 1
-foo@bar:~$ curl --request PUT --data '2' http://localhost:8080/cache/2
-foo@bar:~$ curl --request PUT --data '3' http://localhost:8080/cache/3
-foo@bar:~$ curl --request PUT --data 'some new value' http://localhost:8080/cache/3
-foo@bar:~$ curl --request DELETE http://localhost:8080/cache/3 # Delete key 3
-foo@bar:~$ curl --request GET localhost:8080/cache/3 # Not found 404
+$ curl --request PUT --data '2' http://localhost:8080/cache/2
+$ curl --request PUT --data '3' http://localhost:8080/cache/3
+$ curl --request PUT --data 'some new value' http://localhost:8080/cache/3
+$ curl --request DELETE http://localhost:8080/cache/3 # Delete key 3
+$ curl --request GET localhost:8080/cache/3 # Not found 404
 ```
 
 To retrieve the key
 ```Bash
-foo@bar:~$ curl --request GET localhost:8080/cache/3
+$ curl --request GET localhost:8080/cache/3
 ```
 
 ## Distributed Mode
@@ -99,14 +99,14 @@ A Gerdu cluster of 3 nodes can tolerate a single node failure, while a cluster o
 
 
 ```Bash
-foo@bar:~$ ./gerdu -httpport 8083 --join :8080 --id node1 --raft :12003
-foo@bar:~$ ./gerdu -httpport 8084 --join :8080 --id node2 --raft :12004
+$ ./gerdu -httpport 8083 --join :8080 --id node1 --raft :12003
+$ ./gerdu -httpport 8084 --join :8080 --id node2 --raft :12004
 ```
 
 ## Telemetry 
 [Prometheus](https://prometheus.io) metrics
 ```console
-foo@bar:~$ curl --request GET localhost:8080/metrics
+$ curl --request GET localhost:8080/metrics
 ...
 # HELP gerdu_adds_total The total number of new added nodes
 # TYPE gerdu_adds_total counter
