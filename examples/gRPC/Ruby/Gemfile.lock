@@ -1,10 +1,10 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    google-protobuf (3.13.0-universal-darwin)
+    google-protobuf (3.19.2)
     googleapis-common-protos-types (1.0.5)
       google-protobuf (~> 3.11)
-    grpc (1.31.1-universal-darwin)
+    grpc (1.31.1)
       google-protobuf (~> 3.12)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.31.1)
