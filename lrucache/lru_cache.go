@@ -49,11 +49,15 @@ func expirationFromTTL(ttl time.Duration) time.Time {
 	return time.Now().Add(ttl)
 }
 
+func entrySize(key string, value string) bytesize.ByteSize {
+	return bytesize.ByteSize(len(key) + len(value))
+}
+
 func (c *LRUCache) removeNode(node *dlinklist.Node) {
 	metrics.Deletes.Inc()
 	c.linklist.RemoveNode(node)
 	delete(c.node, node.Key)
-	c.size -= bytesize.ByteSize(len(node.Value))
+	c.size -= entrySize(node.Key, node.Value)
 }
 
 // Get returns the value for the key
@@ -85,27 +89,28 @@ func (c *LRUCache) Put(key string, value string) (created bool) {
 func (c *LRUCache) PutWithTTL(key string, value string, ttl time.Duration) (created bool) {
 	defer c.Unlock()
 	c.Lock()
+
 	expiresAt := expirationFromTTL(ttl)
 	if node, ok := c.node[key]; ok {
-		c.size -= bytesize.ByteSize(len(node.Value))
-		c.size += bytesize.ByteSize(len(value))
+		c.size -= entrySize(node.Key, node.Value)
 		c.linklist.RemoveNode(node)
 		c.linklist.AddNode(node)
 		node.Value = value
 		node.ExpiresAt = expiresAt
+		c.size += entrySize(node.Key, node.Value)
 		created = false
 	} else {
 		node := &dlinklist.Node{Key: key, Value: value, ExpiresAt: expiresAt}
 		c.linklist.AddNode(node)
 		c.node[key] = node
 		metrics.Adds.Inc()
-		c.size += bytesize.ByteSize(len(value))
+		c.size += entrySize(key, value)
 		created = true
 	}
 	for c.size > c.capacity {
 		tail := c.linklist.PopTail()
 		metrics.Deletes.Inc()
-		c.size -= bytesize.ByteSize(len(tail.Value))
+		c.size -= entrySize(tail.Key, tail.Value)
 		delete(c.node, tail.Key)
 	}
 	return created
