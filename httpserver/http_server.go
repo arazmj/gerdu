@@ -2,7 +2,9 @@ package httpserver
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/raftproxy"
 	"github.com/gorilla/mux"
@@ -34,18 +36,47 @@ func newRouter(gerdu cache.UnImplementedCache) (router *mux.Router) {
 	return router
 }
 
+type Server struct {
+	server *http.Server
+}
+
+func newServer(host string, gerdu cache.UnImplementedCache) *Server {
+	return &Server{server: &http.Server{
+		Addr:              host,
+		Handler:           newRouter(gerdu),
+		ReadTimeout:       15 * time.Second,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}}
+}
+
 //HTTPServe start http server in plain text
-func HTTPServe(host string, gerdu cache.UnImplementedCache) {
-	router := newRouter(gerdu)
-	log.Infof("Gerdu started listening HTTP at %s\n", host)
-	log.Fatal(http.ListenAndServe(host, router))
+func HTTPServe(host string, gerdu cache.UnImplementedCache) *Server {
+	server := newServer(host, gerdu)
+	go func() {
+		log.Infof("Gerdu started listening HTTP at %s\n", host)
+		if err := server.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
+	return server
 }
 
 //HTTPServeTLS start HTTP server in secure mode
-func HTTPServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCache) {
-	router := newRouter(gerdu)
-	log.Printf("Gerdu started listening HTTPS TLS at %s\n", host)
-	log.Fatal(http.ListenAndServeTLS(host, tlsCert, tlsKey, router))
+func HTTPServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCache) *Server {
+	server := newServer(host, gerdu)
+	go func() {
+		log.Printf("Gerdu started listening HTTPS TLS at %s\n", host)
+		if err := server.server.ListenAndServeTLS(tlsCert, tlsKey); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
+	return server
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.server.Shutdown(ctx)
 }
 
 func putHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"crypto/tls"
 	"github.com/arazmj/gerdu/cache"
 	log "github.com/sirupsen/logrus"
@@ -10,17 +11,29 @@ import (
 	"time"
 )
 
-func Serve(host string, gerdu cache.UnImplementedCache) {
-	go log.Infof("Gerdu started listening Redis at %s", host)
-	err := redcon.ListenAndServe(host,
+type Server struct {
+	server interface {
+		Close() error
+	}
+}
+
+func Serve(host string, gerdu cache.UnImplementedCache) *Server {
+	server := redcon.NewServer(host,
 		handleCommands(gerdu),
 		handleAccept,
 		handleClose,
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
+	go func() {
+		log.Infof("Gerdu started listening Redis at %s", host)
+		if err := server.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	return &Server{server: server}
+}
 
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.server.Close()
 }
 
 func handleClose(conn redcon.Conn, err error) {
@@ -32,10 +45,12 @@ func handleAccept(conn redcon.Conn) bool {
 	return true
 }
 
-func ServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCache) {
-	go log.Infof("Gerdu started listening Redis at %s", host)
+func ServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCache) *Server {
 	certificate, err := tls.LoadX509KeyPair(tlsCert, tlsKey)
-	err = redcon.ListenAndServeTLS(host,
+	if err != nil {
+		log.Fatal(err)
+	}
+	server := redcon.NewServerTLS(host,
 		handleCommands(gerdu),
 		func(conn redcon.Conn) bool {
 			log.Printf("accept: %s", conn.RemoteAddr())
@@ -47,10 +62,13 @@ func ServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCach
 
 		&tls.Config{Certificates: []tls.Certificate{certificate}},
 	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	go func() {
+		log.Infof("Gerdu started listening Redis at %s", host)
+		if err := server.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	return &Server{server: server}
 }
 
 func parseTTLSeconds(raw []byte) (time.Duration, bool) {
