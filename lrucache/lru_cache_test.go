@@ -72,3 +72,52 @@ func TestLruCache_Delete(t *testing.T) {
 		t.Fatal("Expected the ket to be deleted")
 	}
 }
+
+func TestDeleteDecrementsSize(t *testing.T) {
+	cache := NewCache(4)
+	deletedValue := "aa"
+	remainingValue := "bb"
+	newValue := "cc"
+
+	cache.Put("deleted", deletedValue)
+	sizeAfterFirstPut := cache.size
+	cache.Put("remaining", remainingValue)
+	sizeAfterSecondPut := cache.size
+
+	if !cache.Delete("deleted") {
+		t.Fatal("expected delete to report success")
+	}
+
+	expectedSize := sizeAfterSecondPut - bytesize.ByteSize(len(deletedValue))
+	if cache.size != expectedSize {
+		t.Fatalf("expected size to drop from %s to %s after deleting %q, got %s", sizeAfterSecondPut, expectedSize, deletedValue, cache.size)
+	}
+	if expectedSize != sizeAfterFirstPut {
+		t.Fatalf("expected remaining size %s to match first put size %s", expectedSize, sizeAfterFirstPut)
+	}
+
+	cache.Put("new", newValue)
+	if value, ok := cache.Get("remaining"); !ok || value != remainingValue {
+		t.Fatalf("expected remaining entry to survive equivalent-size put, got %q %t", value, ok)
+	}
+}
+
+func TestDeleteConcurrentSafe(t *testing.T) {
+	capacity, _ := bytesize.Parse("1KB")
+	cache := NewCache(capacity)
+	var wg sync.WaitGroup
+
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			for j := 0; j < 200; j++ {
+				key := strconv.Itoa((i + 1) * j)
+				cache.Put(key, key)
+				cache.Delete(key)
+			}
+		}(i)
+	}
+
+	wg.Wait()
+}
