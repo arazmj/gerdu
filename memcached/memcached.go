@@ -65,7 +65,15 @@ func getHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu ca
 func setHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu cache.UnImplementedCache) error {
 	key := req.Key
 	value := req.Data
-	created := gerdu.Put(key, string(value))
+	ttl := ttlFromExptime(req.Exptime)
+	if req.Exptime > 0 && ttl <= 0 {
+		gerdu.Delete(key)
+		memcachedKeys.Delete(key)
+		memcachedExpirations.Delete(key)
+		res.Response = mc.RespStored
+		return nil
+	}
+	created := gerdu.PutWithTTL(key, string(value), ttl)
 	memcachedKeys.Store(key, struct{}{})
 	if req.Exptime > 0 {
 		memcachedExpirations.Store(key, expirationTime(req.Exptime))
@@ -79,6 +87,17 @@ func setHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu ca
 	}
 	res.Response = mc.RespStored
 	return nil
+}
+
+func ttlFromExptime(exptime int64) time.Duration {
+	if exptime <= 0 {
+		return 0
+	}
+	now := time.Now().Unix()
+	if exptime <= now {
+		return time.Duration(exptime) * time.Second
+	}
+	return time.Until(time.Unix(exptime, 0))
 }
 
 func deleteHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu cache.UnImplementedCache) error {

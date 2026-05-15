@@ -9,6 +9,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func newRouter(gerdu cache.UnImplementedCache) (router *mux.Router) {
@@ -57,8 +59,13 @@ func putHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplemente
 		return
 	}
 	value := buf.String()
+	ttl, err := ttlFromHeader(r.Header.Get("X-TTL"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	created := gerdu.Put(key, value)
+	created := gerdu.PutWithTTL(key, value, ttl)
 	if !created {
 		log.Printf("HTTP UPDATE Key: %s Value: %s\n", key, value)
 	} else {
@@ -70,6 +77,17 @@ func putHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplemente
 	} else {
 		w.WriteHeader(http.StatusNoContent)
 	}
+}
+
+func ttlFromHeader(value string) (time.Duration, error) {
+	if value == "" {
+		return 0, nil
+	}
+	seconds, err := strconv.ParseInt(value, 10, 64)
+	if err != nil || seconds < 0 {
+		return 0, strconv.ErrSyntax
+	}
+	return time.Duration(seconds) * time.Second, nil
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {

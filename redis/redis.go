@@ -5,7 +5,9 @@ import (
 	"github.com/arazmj/gerdu/cache"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/redcon"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func Serve(host string, gerdu cache.UnImplementedCache) {
@@ -51,6 +53,14 @@ func ServeTLS(host string, tlsCert, tlsKey string, gerdu cache.UnImplementedCach
 	}
 }
 
+func parseTTLSeconds(raw []byte) (time.Duration, bool) {
+	seconds, err := strconv.ParseInt(string(raw), 10, 64)
+	if err != nil || seconds <= 0 {
+		return 0, false
+	}
+	return time.Duration(seconds) * time.Second, true
+}
+
 func handleCommands(gerdu cache.UnImplementedCache) func(conn redcon.Conn, cmd redcon.Command) {
 	return func(conn redcon.Conn, cmd redcon.Command) {
 		switch strings.ToLower(string(cmd.Args[0])) {
@@ -62,11 +72,36 @@ func handleCommands(gerdu cache.UnImplementedCache) func(conn redcon.Conn, cmd r
 			conn.WriteString("OK")
 			conn.Close()
 		case "set":
-			if len(cmd.Args) != 3 {
+			if len(cmd.Args) != 3 && len(cmd.Args) != 5 {
 				conn.WriteError("ERR wrong number of arguments for '" + string(cmd.Args[0]) + "' command")
 				return
 			}
-			gerdu.Put(string(cmd.Args[1]), string(cmd.Args[2]))
+			ttl := time.Duration(0)
+			if len(cmd.Args) == 5 {
+				if strings.ToLower(string(cmd.Args[3])) != "ex" {
+					conn.WriteError("ERR syntax error")
+					return
+				}
+				var ok bool
+				ttl, ok = parseTTLSeconds(cmd.Args[4])
+				if !ok {
+					conn.WriteError("ERR invalid expire time in 'set' command")
+					return
+				}
+			}
+			gerdu.PutWithTTL(string(cmd.Args[1]), string(cmd.Args[2]), ttl)
+			conn.WriteString("OK")
+		case "setex":
+			if len(cmd.Args) != 4 {
+				conn.WriteError("ERR wrong number of arguments for '" + string(cmd.Args[0]) + "' command")
+				return
+			}
+			ttl, ok := parseTTLSeconds(cmd.Args[2])
+			if !ok {
+				conn.WriteError("ERR invalid expire time in 'setex' command")
+				return
+			}
+			gerdu.PutWithTTL(string(cmd.Args[1]), string(cmd.Args[3]), ttl)
 			conn.WriteString("OK")
 		case "get":
 			if len(cmd.Args) != 2 {

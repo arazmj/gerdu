@@ -10,6 +10,7 @@ import (
 	"github.com/inhies/go-bytesize"
 	"io"
 	"sync"
+	"time"
 )
 
 // LFUCache data structure
@@ -101,6 +102,11 @@ func (c *LFUCache) Get(key string) (value string, ok bool) {
 // 3. The tail of the DLinkedList with minFreq is the least
 //recently used one, pop it.
 func (c *LFUCache) Put(key, value string) (created bool) {
+	return c.PutWithTTL(key, value, 0)
+}
+
+// PutWithTTL stores a key value pair. LFUCache ignores TTL.
+func (c *LFUCache) PutWithTTL(key, value string, ttl time.Duration) (created bool) {
 	defer c.Unlock()
 	c.Lock()
 	if c.capacity == 0 {

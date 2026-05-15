@@ -38,9 +38,10 @@ type RaftProxy struct {
 }
 
 type command struct {
-	Op    string `json:"op,omitempty"`
-	Key   string `json:"key,omitempty"`
-	Value string `json:"value,omitempty"`
+	Op         string `json:"op,omitempty"`
+	Key        string `json:"key,omitempty"`
+	Value      string `json:"value,omitempty"`
+	TTLSeconds int64  `json:"ttl_seconds,omitempty"`
 }
 
 func NewRaftProxy(imp cache.UnImplementedCache, raftAddr, joinAddr, localId string) *RaftProxy {
@@ -55,10 +56,15 @@ func NewRaftProxy(imp cache.UnImplementedCache, raftAddr, joinAddr, localId stri
 // Put updates or insert a new entry, evicts the old entry
 // if cache size is larger than capacity
 func (c *RaftProxy) Put(key string, value string) (created bool) {
+	return c.PutWithTTL(key, value, 0)
+}
+
+func (c *RaftProxy) PutWithTTL(key string, value string, ttl time.Duration) (created bool) {
 	cmd := &command{
-		Op:    "put",
-		Key:   key,
-		Value: value,
+		Op:         "put",
+		Key:        key,
+		Value:      value,
+		TTLSeconds: int64(ttl / time.Second),
 	}
 
 	future, err := c.applyCommand(cmd)
@@ -155,7 +161,7 @@ func (f *fsm) Apply(l *raft.Log) interface{} {
 		}
 		return response
 	case "put":
-		return f.Imp.Put(cmd.Key, cmd.Value)
+		return f.Imp.PutWithTTL(cmd.Key, cmd.Value, time.Duration(cmd.TTLSeconds)*time.Second)
 	case "delete":
 		return f.Imp.Delete(cmd.Key)
 	default:
