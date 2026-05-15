@@ -52,7 +52,8 @@ func putHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplemente
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Errorf("HTTP PUT: failed to read body: %v", err)
+		http.Error(w, "failed to read request body", http.StatusBadRequest)
 		return
 	}
 	value := buf.String()
@@ -131,7 +132,12 @@ func joinHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplement
 func leaveHandler(w http.ResponseWriter, r *http.Request, gerdu cache.UnImplementedCache) {
 	raftCache := gerdu.(*raftproxy.RaftProxy)
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
+	_, err := buf.ReadFrom(r.Body)
+	if err != nil {
+		log.Errorf("HTTP LEAVE: failed to read body: %v", err)
+		http.Error(w, "failed to read request body", http.StatusBadRequest)
+		return
+	}
 	nodeId := buf.String()
 
 	if nodeId == "" {

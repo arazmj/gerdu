@@ -3,11 +3,38 @@ package httpserver
 import (
 	"github.com/arazmj/gerdu/lrucache"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
+
+type errorReader struct{}
+
+func (errorReader) Read([]byte) (int, error) {
+	return 0, io.ErrUnexpectedEOF
+}
+
+func TestPutHandlerBadBody(t *testing.T) {
+	gerdu := lrucache.NewCache(1)
+	router := mux.NewRouter()
+	router.HandleFunc("/cache/{key}", func(w http.ResponseWriter, r *http.Request) {
+		putHandler(w, r, gerdu)
+	}).Methods(http.MethodPut)
+
+	req := httptest.NewRequest(http.MethodPut, "/cache/bad", errorReader{})
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Failed to produce expected status code %d, got %d", http.StatusBadRequest, w.Code)
+	}
+	if _, ok := gerdu.Get("bad"); ok {
+		t.Error("bad body should not be stored in cache")
+	}
+}
 
 func TestIndexHandler(t *testing.T) {
 	gerdu := lrucache.NewCache(2)
