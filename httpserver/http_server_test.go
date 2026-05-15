@@ -226,7 +226,7 @@ func TestHTTPServeShutdown(t *testing.T) {
 }
 
 func TestIndexHandler(t *testing.T) {
-	gerdu := lrucache.NewCache(2)
+	gerdu := lrucache.NewCache(4)
 	tests := []struct {
 		name             string
 		r                *http.Request

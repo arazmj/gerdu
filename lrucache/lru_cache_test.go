@@ -10,17 +10,17 @@ import (
 )
 
 func TestLRUCache(t *testing.T) {
-	cache := NewCache(2)
+	cache := NewCache(4)
 	cache.Put("1", "1")
 	cache.Put("2", "2")
 	cache.Put("3", "3")
 	if value, ok := cache.Get("1"); ok {
 		t.Errorf("Expected value 1 to be evicted but got %s %t", value, ok)
 	}
-	if value, ok := cache.Get("2"); value != "2" && !ok {
+	if value, ok := cache.Get("2"); value != "2" || !ok {
 		t.Errorf("Expected value 2 but got %s %t", value, ok)
 	}
-	if value, ok := cache.Get("3"); value != "3" && !ok {
+	if value, ok := cache.Get("3"); value != "3" || !ok {
 		t.Errorf("Expected value 3 but got %s %t", value, ok)
 	}
 }
@@ -70,26 +70,67 @@ func TestLruCache_Delete(t *testing.T) {
 	cache.Delete("1")
 	_, getOk2 := cache.Get("1")
 	if !getOk1 || getOk2 {
-		t.Fatal("Expected the ket to be deleted")
+		t.Fatal("Expected the key to be deleted")
+	}
+}
+
+func TestLRUCacheCapacityIncludesKeyBytes(t *testing.T) {
+	cache := NewCache(5)
+	cache.Put("abc", "de")
+
+	if cache.size != 5 {
+		t.Fatalf("Expected cache size to include key and value bytes, got %d", cache.size)
+	}
+	if _, ok := cache.Get("abc"); !ok {
+		t.Fatal("Expected entry using exactly full key+value capacity to remain cached")
+	}
+}
+
+func TestLRUCacheEvictsWhenKeyValueBytesExceedCapacity(t *testing.T) {
+	cache := NewCache(6)
+	cache.Put("abc", "de")
+	cache.Put("fg", "hi")
+
+	if _, ok := cache.Get("abc"); ok {
+		t.Fatal("Expected oldest entry to be evicted when key+value bytes exceed capacity")
+	}
+	if value, ok := cache.Get("fg"); !ok || value != "hi" {
+		t.Fatalf("Expected newest entry to remain, got value=%q ok=%t", value, ok)
+	}
+	if cache.size != 4 {
+		t.Fatalf("Expected cache size to be decremented by evicted key+value bytes, got %d", cache.size)
+	}
+}
+
+func TestLRUCacheDeleteDecrementsKeyValueBytes(t *testing.T) {
+	cache := NewCache(10)
+	cache.Put("abc", "de")
+	cache.Delete("abc")
+
+	if cache.size != 0 {
+		t.Fatalf("Expected delete to decrement key+value bytes, got %d", cache.size)
 	}
 }
 
 func TestDeleteDecrementsSize(t *testing.T) {
-	cache := NewCache(4)
+	cache := NewCache(18)
+	deletedKey := "deleted"
+	remainingKey := "remainx"
+	newKey := "newkeyx"
 	deletedValue := "aa"
 	remainingValue := "bb"
 	newValue := "cc"
 
-	cache.Put("deleted", deletedValue)
+	cache.Put(deletedKey, deletedValue)
 	sizeAfterFirstPut := cache.size
-	cache.Put("remaining", remainingValue)
+	cache.Put(remainingKey, remainingValue)
 	sizeAfterSecondPut := cache.size
 
-	if !cache.Delete("deleted") {
+	if !cache.Delete(deletedKey) {
 		t.Fatal("expected delete to report success")
 	}
 
-	expectedSize := sizeAfterSecondPut - bytesize.ByteSize(len(deletedValue))
+	expectedSize := sizeAfterSecondPut - entrySize(deletedKey, deletedValue)
 	if cache.size != expectedSize {
 		t.Fatalf("expected size to drop from %s to %s after deleting %q, got %s", sizeAfterSecondPut, expectedSize, deletedValue, cache.size)
 	}
@@ -97,8 +138,8 @@ func TestDeleteDecrementsSize(t *testing.T) {
 		t.Fatalf("expected remaining size %s to match first put size %s", expectedSize, sizeAfterFirstPut)
 	}
 
-	cache.Put("new", newValue)
-	if value, ok := cache.Get("remaining"); !ok || value != remainingValue {
+	cache.Put(newKey, newValue)
+	if value, ok := cache.Get(remainingKey); !ok || value != remainingValue {
 		t.Fatalf("expected remaining entry to survive equivalent-size put, got %q %t", value, ok)
 	}
 }
