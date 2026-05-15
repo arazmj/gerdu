@@ -6,6 +6,8 @@ import (
 	mc "github.com/arazmj/gomemcached"
 	log "github.com/sirupsen/logrus"
 	"strconv"
+	"sync"
+	"time"
 )
 
 //Serve start memcached server
@@ -36,14 +38,24 @@ func Serve(host string, gerdu cache.UnImplementedCache) {
 	server.Start()
 }
 
+var (
+	memcachedKeys        sync.Map
+	memcachedExpirations sync.Map
+)
+
 func getHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu cache.UnImplementedCache) error {
 	for _, key := range req.Keys {
+		if expired(key) {
+			gerdu.Delete(key)
+			memcachedKeys.Delete(key)
+			memcachedExpirations.Delete(key)
+			continue
+		}
 		value, ok := gerdu.Get(key)
 		if ok {
-
 			log.Printf("Memcached RETRIEVED Key: %s Value: %s\n", key, value)
+			res.Values = append(res.Values, mc.Value{Key: key, Flags: "0", Data: []byte(value)})
 		}
-		res.Values = append(res.Values, mc.Value{Key: key, Flags: "0", Data: []byte(value)})
 	}
 
 	res.Response = mc.RespEnd
@@ -54,6 +66,12 @@ func setHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu ca
 	key := req.Key
 	value := req.Data
 	created := gerdu.Put(key, string(value))
+	memcachedKeys.Store(key, struct{}{})
+	if req.Exptime > 0 {
+		memcachedExpirations.Store(key, expirationTime(req.Exptime))
+	} else {
+		memcachedExpirations.Delete(key)
+	}
 	if !created {
 		log.Printf("Memcached UPDATE Key: %s Value: %s\n", key, value)
 	} else {
@@ -68,6 +86,8 @@ func deleteHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu
 	for _, key := range req.Keys {
 		if _, exists := gerdu.Get(key); exists {
 			ok := gerdu.Delete(key)
+			memcachedKeys.Delete(key)
+			memcachedExpirations.Delete(key)
 			if ok {
 				log.Printf("Memcached DELETE Key: %s\n", key)
 			}
@@ -107,10 +127,28 @@ func incrHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu c
 }
 
 func flushAllHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu cache.UnImplementedCache) error {
-
-	log.Fatalln("Memcached not implemented flush all")
+	memcachedKeys.Range(func(key, value interface{}) bool {
+		keyString := key.(string)
+		gerdu.Delete(keyString)
+		memcachedKeys.Delete(keyString)
+		memcachedExpirations.Delete(keyString)
+		return true
+	})
 	res.Response = mc.RespOK
 	return nil
+}
+
+func expirationTime(exptime int64) int64 {
+	now := time.Now().Unix()
+	if exptime <= now {
+		return now + exptime
+	}
+	return exptime
+}
+
+func expired(key string) bool {
+	expiresAt, ok := memcachedExpirations.Load(key)
+	return ok && time.Now().Unix() >= expiresAt.(int64)
 }
 
 func versionHandler(ctx context.Context, req *mc.Request, res *mc.Response, gerdu cache.UnImplementedCache) error {
