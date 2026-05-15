@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	cache "github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/grpcserver"
@@ -17,9 +18,15 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 )
 
 var gerdu raftproxy.RaftCache
+
+type protocolServer interface {
+	Shutdown(context.Context) error
+}
 
 var (
 	loglevel = flag.String("log", "info",
@@ -58,50 +65,53 @@ func serve() {
 	*protocols = strings.ToLower(*protocols)
 	secure := len(*tlsCert) > 0 && len(*tlsKey) > 0
 
-	go func() {
-		httpHost := *host + ":" + strconv.Itoa(*httpPort)
-		if secure {
-			httpserver.HTTPServeTLS(httpHost, *tlsCert, *tlsKey, gerdu)
-		} else {
-			httpserver.HTTPServe(httpHost, gerdu)
-		}
-	}()
+	servers := make([]protocolServer, 0, 4)
+	httpHost := *host + ":" + strconv.Itoa(*httpPort)
+	if secure {
+		servers = append(servers, httpserver.HTTPServeTLS(httpHost, *tlsCert, *tlsKey, gerdu))
+	} else {
+		servers = append(servers, httpserver.HTTPServe(httpHost, gerdu))
+	}
 
 	if strings.Contains(*protocols, "grpc") {
-		go func() {
-			grpcHost := *host + ":" + strconv.Itoa(*grpcPort)
-			if secure {
-				grpcserver.GrpcServeTLS(grpcHost, *tlsCert, *tlsKey, gerdu)
-			} else {
-				grpcserver.GrpcServe(grpcHost, gerdu)
-			}
-		}()
+		grpcHost := *host + ":" + strconv.Itoa(*grpcPort)
+		if secure {
+			servers = append(servers, grpcserver.GrpcServeTLS(grpcHost, *tlsCert, *tlsKey, gerdu))
+		} else {
+			servers = append(servers, grpcserver.GrpcServe(grpcHost, gerdu))
+		}
 	}
 	if strings.Contains(*protocols, "mcd") {
-		go func() {
-			mcdHost := *host + ":" + strconv.Itoa(*mcdPort)
-			if secure {
-				log.Fatalln("Memcached protocol does not support TLS")
-				os.Exit(1)
-			}
-			memcached.Serve(mcdHost, gerdu)
-		}()
+		mcdHost := *host + ":" + strconv.Itoa(*mcdPort)
+		if secure {
+			log.Fatalln("Memcached protocol does not support TLS")
+			os.Exit(1)
+		}
+		servers = append(servers, memcached.Serve(mcdHost, gerdu))
 	}
 
 	if strings.Contains(*protocols, "redis") {
-		go func() {
-			redisHost := *host + ":" + strconv.Itoa(*redisPort)
-			if secure {
-				redis.ServeTLS(redisHost, *tlsCert, *tlsKey, gerdu)
-			} else {
-				redis.Serve(redisHost, gerdu)
-			}
-		}()
+		redisHost := *host + ":" + strconv.Itoa(*redisPort)
+		if secure {
+			servers = append(servers, redis.ServeTLS(redisHost, *tlsCert, *tlsKey, gerdu))
+		} else {
+			servers = append(servers, redis.Serve(redisHost, gerdu))
+		}
 	}
 
 	terminate := make(chan os.Signal, 1)
-	signal.Notify(terminate, os.Interrupt)
-	<-terminate
+	signal.Notify(terminate, os.Interrupt, syscall.SIGTERM)
+	sig := <-terminate
+	log.Infof("Received %s, shutting down", sig)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	for _, server := range servers {
+		if err := server.Shutdown(ctx); err != nil {
+			log.Errorf("Cannot shut down server gracefully: %v", err)
+		}
+	}
+
 	err := gerdu.(*raftproxy.RaftProxy).Leave(*nodeID)
 	if err != nil {
 		log.Errorf("Cannot leave the cluster gracefully %v", err)

@@ -10,8 +10,12 @@ import (
 	"time"
 )
 
+type Server struct {
+	server *mc.Server
+}
+
 //Serve start memcached server
-func Serve(host string, gerdu cache.UnImplementedCache) {
+func Serve(host string, gerdu cache.UnImplementedCache) *Server {
 	server := mc.NewServer(host)
 	server.RegisterFunc("get", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return getHandler(ctx, req, res, gerdu)
@@ -35,7 +39,14 @@ func Serve(host string, gerdu cache.UnImplementedCache) {
 	server.RegisterFunc("version", func(ctx context.Context, req *mc.Request, res *mc.Response) error {
 		return versionHandler(ctx, req, res, gerdu)
 	})
-	server.Start()
+	if err := server.Start(); err != nil {
+		log.Fatal(err)
+	}
+	return &Server{server: server}
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.server.Stop()
 }
 
 var (
