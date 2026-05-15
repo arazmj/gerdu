@@ -1,0 +1,8 @@
+linters:
+  disable-all: false
+  enable:
+    - govet
+    - ineffassign
+    - errcheck
+    - gosimple
+    - staticcheck
