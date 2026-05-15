@@ -201,7 +201,7 @@ func TestLRUCacheEvictExpiredRemovesEntries(t *testing.T) {
 }
 
 func TestLRUCache_MissesBoundariesAndRecency(t *testing.T) {
-	cache := NewCache(2)
+	cache := NewCache(3)
 	if value, ok := cache.Get("missing"); ok || value != "" {
 		t.Fatalf("expected empty miss, got %q %t", value, ok)
 	}
@@ -213,10 +213,10 @@ func TestLRUCache_MissesBoundariesAndRecency(t *testing.T) {
 		t.Fatal("expected exact-capacity put to create an entry")
 	}
 	if value, ok := cache.Get("a"); !ok || value != "aa" {
-		t.Fatalf("expected exact-capacity value to remain, got %q %t", value, ok)
+		t.Fatalf("expected exact-capacity key+value to remain, got %q %t", value, ok)
 	}
 
-	cache = NewCache(2)
+	cache = NewCache(4)
 	cache.Put("a", "1")
 	cache.Put("b", "2")
 	if value, ok := cache.Get("a"); !ok || value != "1" {

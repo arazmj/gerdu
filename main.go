@@ -112,7 +112,12 @@ func serve() {
 		}
 	}
 
-	err := gerdu.(*raftproxy.RaftProxy).Leave(*nodeID)
+	proxy := gerdu.(*raftproxy.RaftProxy)
+	if err := proxy.Shutdown(ctx); err != nil {
+		log.Errorf("Cannot shut down cache gracefully: %v", err)
+	}
+
+	err := proxy.Leave(*nodeID)
 	if err != nil {
 		log.Errorf("Cannot leave the cluster gracefully %v", err)
 	} else {
