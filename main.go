@@ -45,8 +45,6 @@ var (
 	joinAddr = flag.String("join", "", "Set join address, if any")
 	nodeID   = flag.String("id", "master", "Node ID")
 	storage  = flag.String("storage", "", "Path to store log files and snapshot, will store in memory if not set")
-
-	secure = len(*tlsCert) > 0 && len(*tlsKey) > 0
 )
 
 func main() {
@@ -58,6 +56,7 @@ func main() {
 
 func serve() {
 	*protocols = strings.ToLower(*protocols)
+	secure := len(*tlsCert) > 0 && len(*tlsKey) > 0
 
 	go func() {
 		httpHost := *host + ":" + strconv.Itoa(*httpPort)
