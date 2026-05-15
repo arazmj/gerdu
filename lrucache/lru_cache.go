@@ -79,9 +79,13 @@ func (c *LRUCache) Put(key string, value string) (created bool) {
 
 //applyDelete the key from the node
 func (c *LRUCache) Delete(key string) (ok bool) {
+	c.Lock()
+	defer c.Unlock()
+
 	if node, ok := c.node[key]; ok {
 		metrics.Deletes.Inc()
 		c.linklist.RemoveNode(node)
+		c.size -= bytesize.ByteSize(len(node.Value))
 		delete(c.node, key)
 	} else {
 		return false
