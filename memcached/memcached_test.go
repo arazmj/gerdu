@@ -22,6 +22,10 @@ func newTestCache() *testCache {
 }
 
 func (c *testCache) Put(key string, value string) bool {
+	return c.PutWithTTL(key, value, 0)
+}
+
+func (c *testCache) PutWithTTL(key string, value string, ttl time.Duration) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	_, exists := c.values[key]

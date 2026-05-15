@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestLRUCache(t *testing.T) {
@@ -120,4 +121,36 @@ func TestDeleteConcurrentSafe(t *testing.T) {
 	}
 
 	wg.Wait()
+}
+
+func TestLRUCachePutWithTTLExpiresOnGet(t *testing.T) {
+	cache := NewCache(10)
+	cache.PutWithTTL("1", "1", 20*time.Millisecond)
+	if value, ok := cache.Get("1"); !ok || value != "1" {
+		t.Fatalf("Expected value before TTL expiry, got %q %t", value, ok)
+	}
+
+	time.Sleep(40 * time.Millisecond)
+	if value, ok := cache.Get("1"); ok {
+		t.Fatalf("Expected value to expire, got %q", value)
+	}
+}
+
+func TestLRUCachePutWithZeroTTLDoesNotExpire(t *testing.T) {
+	cache := NewCache(10)
+	cache.PutWithTTL("1", "1", 0)
+	time.Sleep(20 * time.Millisecond)
+	if value, ok := cache.Get("1"); !ok || value != "1" {
+		t.Fatalf("Expected value without TTL to remain, got %q %t", value, ok)
+	}
+}
+
+func TestLRUCacheEvictExpiredRemovesEntries(t *testing.T) {
+	cache := NewCache(10)
+	cache.PutWithTTL("1", "1", 20*time.Millisecond)
+	time.Sleep(40 * time.Millisecond)
+	cache.evictExpired(time.Now())
+	if _, ok := cache.node["1"]; ok {
+		t.Fatal("Expected sweeper eviction to remove expired entry")
+	}
 }

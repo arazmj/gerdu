@@ -10,6 +10,7 @@ import (
 	"github.com/ivanrad/go-weakref/weakref"
 	"io"
 	"sync"
+	"time"
 )
 
 // WeakCache data structure
@@ -25,6 +26,11 @@ func NewWeakCache() *WeakCache {
 
 // Put a new key value pair
 func (c *WeakCache) Put(key string, value string) (created bool) {
+	return c.PutWithTTL(key, value, 0)
+}
+
+// PutWithTTL stores a new key value pair. WeakCache ignores TTL.
+func (c *WeakCache) PutWithTTL(key string, value string, ttl time.Duration) (created bool) {
 	metrics.Adds.Inc()
 	ref := weakref.NewWeakRef(value)
 	c.Store(key, ref)

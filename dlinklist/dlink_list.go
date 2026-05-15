@@ -1,13 +1,16 @@
 // Package dlinklist implements a doubly linked list as backing data structure for cache operations
 package dlinklist
 
+import "time"
+
 // Node data structure
 type Node struct {
-	next  *Node
-	prev  *Node
-	Key   string
-	Value string
-	Freq  int
+	next      *Node
+	prev      *Node
+	Key       string
+	Value     string
+	Freq      int
+	ExpiresAt time.Time
 }
 
 // DLinkedList data structure
