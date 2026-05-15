@@ -2,6 +2,7 @@ package raftproxy
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -51,6 +52,16 @@ func NewRaftProxy(imp cache.UnImplementedCache, raftAddr, joinAddr, localId stri
 		joinAddr: joinAddr,
 		localId:  localId,
 	}
+}
+
+func (c *RaftProxy) Shutdown(ctx context.Context) error {
+	shutdowner, ok := c.Imp.(interface {
+		Shutdown(context.Context) error
+	})
+	if !ok {
+		return nil
+	}
+	return shutdowner.Shutdown(ctx)
 }
 
 // Put updates or insert a new entry, evicts the old entry

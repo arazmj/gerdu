@@ -2,6 +2,7 @@
 package lrucache
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/arazmj/gerdu/cache"
 	"github.com/arazmj/gerdu/dlinklist"
@@ -23,6 +24,9 @@ type LRUCache struct {
 	linklist *dlinklist.DLinkedList
 	capacity bytesize.ByteSize
 	size     bytesize.ByteSize
+	stopCh   chan struct{}
+	doneCh   chan struct{}
+	stopOnce sync.Once
 }
 
 // NewCache LRUCache constructor
@@ -33,6 +37,8 @@ func NewCache(capacity bytesize.ByteSize) *LRUCache {
 		linklist: dlinklist.NewLinkedList(),
 		capacity: capacity,
 		size:     0,
+		stopCh:   make(chan struct{}),
+		doneCh:   make(chan struct{}),
 	}
 	go l.sweepExpiredEntries()
 	return l
@@ -128,10 +134,30 @@ func (c *LRUCache) Delete(key string) (ok bool) {
 	return false
 }
 
+func (c *LRUCache) Shutdown(ctx context.Context) error {
+	c.stopOnce.Do(func() {
+		close(c.stopCh)
+	})
+
+	select {
+	case <-c.doneCh:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
 func (c *LRUCache) sweepExpiredEntries() {
 	ticker := time.NewTicker(sweepInterval)
-	for range ticker.C {
-		c.evictExpired(time.Now())
+	defer ticker.Stop()
+	defer close(c.doneCh)
+	for {
+		select {
+		case <-ticker.C:
+			c.evictExpired(time.Now())
+		case <-c.stopCh:
+			return
+		}
 	}
 }
 
