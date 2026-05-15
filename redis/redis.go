@@ -68,6 +68,8 @@ func handleCommands(gerdu cache.UnImplementedCache) func(conn redcon.Conn, cmd r
 			conn.WriteError("ERR unknown command '" + string(cmd.Args[0]) + "'")
 		case "ping":
 			conn.WriteString("PONG")
+		case "command":
+			conn.WriteArray(0)
 		case "quit":
 			conn.WriteString("OK")
 			conn.Close()
