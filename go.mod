@@ -1,6 +1,6 @@
 module github.com/arazmj/gerdu
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/arazmj/gomemcached v0.0.0-20200817025853-51c9346db062
@@ -14,8 +14,8 @@ require (
 	github.com/prometheus/client_golang v1.21.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/tidwall/redcon v1.3.2
-	google.golang.org/grpc v1.79.3
-	google.golang.org/protobuf v1.36.10
+	google.golang.org/grpc v1.82.1
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -39,8 +39,8 @@ require (
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.16.0 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
-	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
+	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
 )
