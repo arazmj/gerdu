@@ -205,6 +205,7 @@ Sample applications are available in:
 - GoLang ([HTTP](examples/HTTP/GoLang/main.go), [gRPC](examples/gRPC/GoLang/main.go), [memcached](examples/memcached/GoLang/main.go))
 - Groovy ([HTTP](examples/HTTP/Groovy/main.groovy))
 - Haskell ([HTTP](examples/HTTP/Haskell/app/Main.hs))
+- iOS / Apple platforms ([GerduKit Swift package](examples/iOS/GerduKit))
 - Java ([HTTP](examples/HTTP/Java/src/GoCache.java), [gRPC](examples/gRPC/Java/src/main/java/net/amirrazmjou/Main.java))
 - Kotlin ([HTTP](examples/HTTP/Kotlin/src/Main.kt))
 - NodeJS ([HTTP](examples/HTTP/NodeJS/app.js))
@@ -217,3 +218,23 @@ Sample applications are available in:
 - Rust ([HTTP](examples/HTTP/Rust/main.rs), [gRPC](examples/gRPC/Rust/src/main.rs))
 - Scala ([HTTP](examples/HTTP/Scala/src/main/scala/com/amirrazmjou/go/cache/example/Example.scala))
 - Swift ([HTTP](examples/HTTP/Swift/GoCacheSwift/main.swift))
+
+### iOS and other Apple platforms
+
+iOS apps can talk to Gerdu over its always-on HTTP API. The
+[`GerduKit`](examples/iOS/GerduKit) Swift package provides a reusable,
+dependency-free client (`put`, `get`, `delete`) with both `async`/`await` and
+completion-handler APIs, and runs on iOS, macOS, tvOS, and watchOS:
+
+```swift
+import GerduKit
+
+let client = try GerduClient(host: "127.0.0.1", port: 8080)
+try await client.put(key: "greeting", value: "hello")
+let value = try await client.get(key: "greeting") // "hello"
+```
+
+Add it through Swift Package Manager and see [`examples/iOS/GerduKit`](examples/iOS/GerduKit)
+for installation, a SwiftUI example, and App Transport Security (HTTP vs TLS)
+guidance. For gRPC on Apple platforms, see the
+[Objective-C gRPC example](examples/gRPC/Objective-C).
